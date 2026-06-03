@@ -743,6 +743,8 @@ const WORD_DB = {
     {word:'nutty',  choices:['nutty','nutey','nuttey','nuty'], rule:'double', syllables:[{text:'nut',type:'closed',vowelMark:'ŭ'},{text:'ty',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ŭ/ + single consonant → Rabbit Rule doubles "t"'},
     {word:'foggy',  choices:['foggy','fogey','fogie','foggey'], rule:'double', syllables:[{text:'fog',type:'closed',vowelMark:'ŏ'},{text:'gy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ŏ/ + single consonant → Rabbit Rule doubles "g"'},
     {word:'dizzy',  choices:['dizzy','dizey','dizie','dizzey'], rule:'double', syllables:[{text:'diz',type:'closed',vowelMark:'ĭ'},{text:'zy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ĭ/ + single consonant → Rabbit Rule doubles "z"'},
+    {word:'jolly',  choices:['jolly','joley','jolie','jollney'], rule:'double', syllables:[{text:'jol',type:'closed',vowelMark:'ŏ'},{text:'ly',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ŏ/ + single consonant → Rabbit Rule doubles "l" · jolly'},
+    {word:'hobby',  choices:['hobby','hobey','hobie','hobbey'], rule:'double', syllables:[{text:'hob',type:'closed',vowelMark:'ŏ'},{text:'by',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ŏ/ + single consonant → Rabbit Rule doubles "b" · hobby'},
   ],
   '5.4-mixed': [
     {word:'monkey', choices:['monkey','monky','monkie','munkee'], rule:'open', syllables:[{text:'mon',type:'closed',vowelMark:'ŏ'},{text:'key',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Exception: "monkey" uses -ey (not -y) · high-frequency word'},
@@ -765,6 +767,18 @@ const WORD_DB = {
     {word:'bumpy',  choices:['bumpy','bumpey','bumpie','bummpy'], rule:'double', syllables:[{text:'bump',type:'closed',vowelMark:'ŭ'},{text:'y',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Closed first syllable — consonant cluster "mp" — y = long /ē/'},
     {word:'dusty',  choices:['dusty','dustey','dustie','dussty'], rule:'double', syllables:[{text:'dust',type:'closed',vowelMark:'ŭ'},{text:'y',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Closed first syllable — consonant cluster "st" — y = long /ē/'},
     {word:'rusty',  choices:['rusty','rustey','rustie','russty'], rule:'double', syllables:[{text:'rust',type:'closed',vowelMark:'ŭ'},{text:'y',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Closed first syllable — consonant cluster "st" — y = long /ē/'},
+    {word:'clumsy', choices:['clumsy','clumsey','clumsie','clummsy'], rule:'double', syllables:[{text:'clum',type:'closed',vowelMark:'ŭ'},{text:'sy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Closed first syllable — consonant cluster "lm" — y = long /ē/ · clumsy'},
+    {word:'pansy',  choices:['pansy','pansey','pansie','pannsy'], rule:'double', syllables:[{text:'pan',type:'closed',vowelMark:'ă'},{text:'sy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Closed first syllable — consonant cluster "ns" — y = long /ē/ · pansy'},
+  ],
+  '5.5-rr': [
+    {word:'worry',  choices:['worry','wory','worrey','worrie'], rule:'double', syllables:[{text:'wor',type:'closed',vowelMark:'ŭ'},{text:'ry',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short vowel + single r → Rabbit Rule doubles "r" · worry'},
+    {word:'hurry',  choices:['hurry','hury','hurrey','hurrie'], rule:'double', syllables:[{text:'hur',type:'closed',vowelMark:'ŭ'},{text:'ry',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ŭ/ + single r → Rabbit Rule doubles "r" · hurry'},
+    {word:'carry',  choices:['carry','cary','carrey','carrie'], rule:'double', syllables:[{text:'car',type:'closed',vowelMark:'ă'},{text:'ry',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ă/ + single r → Rabbit Rule doubles "r" · carry'},
+    {word:'sorry',  choices:['sorry','sory','sorrey','sorrie'], rule:'double', syllables:[{text:'sor',type:'closed',vowelMark:'ŏ'},{text:'ry',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ŏ/ + single r → Rabbit Rule doubles "r" · sorry'},
+    {word:'merry',  choices:['merry','mery','merrey','merrie'], rule:'double', syllables:[{text:'mer',type:'closed',vowelMark:'ĕ'},{text:'ry',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ĕ/ + single r → Rabbit Rule doubles "r" · merry'},
+    {word:'berry',  choices:['berry','bery','berrey','berrie'], rule:'double', syllables:[{text:'ber',type:'closed',vowelMark:'ĕ'},{text:'ry',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ĕ/ + single r → Rabbit Rule doubles "r" · berry'},
+    {word:'cherry', choices:['cherry','chery','cherrey','cherrie'], rule:'double', syllables:[{text:'cher',type:'closed',vowelMark:'ĕ'},{text:'ry',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ĕ/ + single r → Rabbit Rule doubles "r" · cherry'},
+    {word:'ferry',  choices:['ferry','fery','ferrey','ferrie'], rule:'double', syllables:[{text:'fer',type:'closed',vowelMark:'ĕ'},{text:'ry',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ĕ/ + single r → Rabbit Rule doubles "r" · ferry'},
   ],
   '5.5-mixed': [
     {word:'worry',  choices:['worry','worrey','wory','worrrey'], rule:'double', syllables:[{text:'wor',type:'closed',vowelMark:'ŭ'},{text:'ry',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ŭ/ + r → Rabbit Rule doubles "r"'},
@@ -868,88 +882,111 @@ const BRIEFINGS = [
 
 // ── READING PASSAGES & QUESTIONS ──
 const READINGS = [
-  // Mission 1
+  // Mission 1 — Step 5.3 · "The Pony Ride"
   {
-    title: 'The Pony and the Baby Fox',
-    text: `A <span class="highlight">pony</span> lived on a cozy farm. One day, a tiny fox came to visit. The fox was funny and silly. The pony let the baby fox rest by the gate. "This is a happy place," said the pony. The lazy sun set slowly. The <span class="highlight">tiny</span> fox ran home to its family, feeling very lucky.`,
+    title: 'The Pony Ride',
+    text: `Sally is five years old, and she has always wanted to go on a <span class="hl">pony</span> ride. She has made this request many times. At last, her dad comes into the house and asks, "Sally, don't you think we ought to go on that pony ride today?"
+    <br><br>Dad, Mom, and Sally drive twelve miles until they find the big ranch owned by Mrs. Holly. The land is wide, and there is a tall windmill just past the chicken shed.
+    <br><br>The three walk over to the pen to stare at the <span class="hl">beautiful</span> pony. However, Sally does not get too close. She hides behind her dad and acts in a <span class="hl">shy</span> way. It takes her some time to learn that it is safe to be next to the tiny pony whose name is Benny.
+    <br><br>When the woman swings the gate open, Sally gives Benny a big hug and small pat on his mane. Sally gets on the pony and yells, "He is so pretty!" She is a very <span class="hl">happy</span> person on top of this strong pony. When it is time to go, Sally thanks Mrs. Holly and hopes to come back to ride Benny again.`,
     questions: [
-      {q:'What animal came to visit the pony?', options:['A puppy','A tiny fox','A bunny','A baby robin'], answer:1},
-      {q:'Which word from the story ends with the Double Shield (Rabbit Rule) pattern?', options:['pony','lazy','funny','tiny'], answer:2},
-      {q:'Where did the tiny fox rest?', options:['In the barn','By the gate','In the hay','Under a tree'], answer:1},
+      {q:'What is the name of the pony in this story?', options:['Holly','Sally','Benny','Billy'], answer:2},
+      {q:'At first, how does Sally act when she sees the pony?', options:['She jumps right on','She acts shy and hides behind her dad','She pets the pony at once','She asks to go home'], answer:1},
+      {q:'Which word from the story ends with the -y pattern meaning /ē/?', options:['wide','safe','happy','ranch'], answer:2},
     ]
   },
-  // Mission 2
+  // Mission 2 — Step 5.3 · "Libby Makes Grape Jelly"
   {
-    title: 'The Muddy Puppy',
-    text: `The <span class="highlight">puppy</span> was very muddy after the rain. The kitty watched from the porch, looking silly. "You are <span class="highlight">silly</span>," said the kitty. The puppy just wagged its tail, happy and nutty. Mom got a tub of soapy water. The puppy became less muddy. Then it ran back to play in the foggy yard again.`,
+    title: 'Libby Makes Grape Jelly',
+    text: `Libby is on a visit with Granny at her small log cabin. The cabin is just the right size for one person. Libby thinks it is <span class="hl">cozy</span>. Granny has a big, beautiful vase of holly on the desk and a dish of ruby red taffy. The cabin is so <span class="hl">pretty</span> and tidy that Libby likes visiting as often as she can.
+    <br><br>Today, Granny will help Libby learn to make grape jelly. If it comes out right, Libby will take a bunch home for her mom and dad. Granny puts the plump grapes in a big pot with sugar and a cup of water. She puts the pot on the stove for ten minutes until everything gets very hot.
+    <br><br>Granny has Libby take out the leftover chunks of grapes and put them in the trash. The liquid that is left is put on the stove again until it turns thick. Libby puts this thick grape <span class="hl">jelly</span> into small crocks and shuts them with a lid.
+    <br><br>At last, it is time for Granny and Libby to put their grape jelly on some muffins and bagels. It tastes so good! Mom and Dad will be pleased to get the crocks of grape jelly.`,
     questions: [
-      {q:'What made the puppy muddy?', options:['Playing in dirt','The rain','A muddy pond','Digging holes'], answer:1},
-      {q:'Which word from the story shows the Rabbit Rule with double "pp"?', options:['muddy','kitty','puppy','foggy'], answer:2},
-      {q:'What did the kitty say to the puppy?', options:['"You are messy"','"You are silly"','"You need a bath"','"Stop running!"'], answer:1},
+      {q:'What do Granny and Libby make together?', options:['Ruby red taffy','Grape jelly','Plum jam','Holly tea'], answer:1},
+      {q:'Which word from the story uses the Rabbit Rule (double "ll")?', options:['cozy','pretty','jelly','tiny'], answer:2},
+      {q:'What does Libby plan to do with the jelly she makes?', options:['Sell it at a stand','Eat it all herself','Take a bunch home for her mom and dad','Give it to Mrs. Holly'], answer:2},
     ]
   },
-  // Mission 3
+  // Mission 3 — Step 5.3 · "The Jolly Menu"
   {
-    title: 'A Trip to the Valley',
-    text: `In the <span class="highlight">valley</span>, there was a rocky path and a honey stand. A monkey swung from the trees, eating something sticky. "<span class="highlight">Lucky</span> monkey!" said Sam. The turkey in the field gobbled. Sam bought honey and walked back up the dusty trail. The windy sky made the trees sway. What a fancy day!`,
+    title: 'The Jolly Menu',
+    text: `Jimmy had a long day at work. He drove home at four o'clock with plans to fix something to dine on. His mind had been set on the chicken he bought at the store. However, when he got to his house, he learned that the chicken was still frozen! He thought, "I don't have time for it to become soft!" He would have to rethink his plan and opt for something else. Jimmy was a <span class="hl">person</span> who could solve any problem.
+    <br><br>So, he went into the pantry to look around. He did recall that he had plenty of duck left over from the evening before when his wife made their dinner. It would be sad to waste it. Jimmy did not wish to have the same exact thing, so he used <span class="hl">jelly</span> and cloves to make a <span class="hl">gravy</span> to go with the duck. He then made a kale and fennel salad.
+    <br><br>Jimmy's wife, Meg, came home just after dusk. The salad had a funny taste, and the gravy was full of lumps! Still, Meg was happy to have a pretty full belly. She made jokes with Jimmy to try to console him. He could never resist Meg's wit and <span class="hl">beautiful</span> smile. Jimmy and Meg ended their menu with some pastry and a good chat.`,
     questions: [
-      {q:'Which word in the story uses the -ey ending?', options:['lucky','rocky','windy','honey'], answer:3},
-      {q:'What was the monkey eating?', options:['Something sticky','A pony tail','Some candy','Dusty nuts'], answer:0},
-      {q:'What did Sam buy at the stand?', options:['Turkey','Rocky candy','Honey','Fancy nuts'], answer:2},
+      {q:'Why couldn\'t Jimmy make the chicken he had planned?', options:['He forgot to buy it','It was still frozen','Meg ate it already','He burned it'], answer:1},
+      {q:'Which word from the story uses the -ey ending instead of -y?', options:['funny','gravy','jelly','pretty'], answer:2},
+      {q:'How did Meg react to the meal Jimmy made?', options:['She was very upset','She made jokes and tried to console him','She refused to eat it','She cooked something else'], answer:1},
     ]
   },
-  // Mission 4
+  // Mission 4 — Step 5.4 · "Abby's Brave Day"
   {
-    title: 'The Handy Inventor',
-    text: `Benny had a handy plan. He wanted to build a fancy rocket from empty cans and dusty wires. It was windy outside, but Benny felt bumpy with excitement. "This candy-colored rocket will fly to the Nebula-Y zone," he said. It was a tricky job, but Benny was not the type to feel empty inside.`,
+    title: "Abby's Brave Day",
+    text: `The hillside wildfires are now developing into a big risk for the homeowners of the local district. Mothers, fathers, sons, and daughters have all been told to exit their homes and find a safe place away from the destructive event.
+    <br><br>But not Abby. In the firetruck, Abby makes her way toward the unprotected homes close to the hillside. Abby is part of a unit of twenty-five firemen and firewomen, and they are never off-duty. It is their job to ensure that all the occupants relocate to a secure spot.
+    <br><br>As the flames extend past the hills, the fire unit progresses to one home after another. At the sixth house, Abby walks around and checks the back of the home. All of a sudden, she detects a soft cry from under the deck. She looks and finds out that the cry is coming from a cat. In fact, Abby spots not just one cat, but a <span class="hl">mother</span> cat and five kittens!
+    <br><br>One by one, Abby puts the mother cat and all the kittens into her bag and sprints off to the firetruck. Abby makes it to the firetruck and lets the cats out. She tells Ladybug that she has been the best <span class="hl">mother</span> to protect these small kittens. Away from the wildfire, Ladybug and all the kitten brothers and sisters can relax now.`,
     questions: [
-      {q:'What did Benny want to build?', options:['A fancy car','A handy rocket','A bumpy sled','A windy kite'], answer:1},
-      {q:'Which word from the story uses a consonant cluster before -y?', options:['Benny','rocky','dusty','tricky'], answer:2},
-      {q:'How did Benny feel about the project?', options:['Empty inside','Sleepy','Bumpy with excitement','Rusty'], answer:2},
+      {q:'What is Abby\'s job in this story?', options:['She is a homeowner','She is part of a fire unit','She is a vet','She is a police officer'], answer:1},
+      {q:'What does Abby find under the deck of the sixth house?', options:['A family hiding','A mother cat and five kittens','A lost child','A small dog'], answer:1},
+      {q:'Which word from the story fits the pattern: closed first syllable + consonant cluster + -y?', options:['Abby','mother','dusty','kittens'], answer:2},
     ]
   },
-  // Mission 5
+  // Mission 5 — Step 5.5 · "Mojo, the Dog Who Digs"
   {
-    title: 'Hurry, Berry, Sorry!',
-    text: `"<span class="highlight">Hurry</span>!" said Carrie. She had to carry the sorry-looking berry basket to the merry fair. The cherry stand was a ferry ride away. She was in a hurry, so she ran. The foggy morning made the path slippery. But Carrie was lucky: the ferry was running late too. She made it just in time, and everyone was merry.`,
+    title: 'Mojo, the Dog Who Digs',
+    text: `Mojo was a good <span class="hl">family</span> dog. However, to pass the time, Mojo would dig one hole after another. His owner, Logan, would come home from work every day and find holes all over his land. This would both amaze and upset Logan. Since Mojo was not aware that this upset his owner, he kept up his instinctive habit. But soon it was evident that something had to be done about all the holes!
+    <br><br>Early one day, Logan had a thought. He had many beautiful pines on his land. Each spring, he would plant more pines to sell to <span class="hl">families</span> to landscape around their homes. He could use Mojo's holes to help him plant more pines! He was positive that this was a good way to benefit from Mojo's holes.
+    <br><br>When it was time to plant the pines, Logan did not have to dig any holes at all. He could just put the small plants in the holes dug by Mojo. The dog was unaware of the gift he had given Logan. Logan's land became even more beautiful, and he was sure that he had the best pet!`,
     questions: [
-      {q:'What was Carrie carrying?', options:['A merry basket','A cherry ferry','A sorry-looking berry basket','A foggy lantern'], answer:2},
-      {q:'Which pattern do "hurry," "carry," and "sorry" all share?', options:['Open Engine with -y','Rabbit Rule — double rr','Consonant cluster','Exception -ey'], answer:1},
-      {q:'Why was Carrie lucky?', options:['She found the berries','The ferry was running late','She won the fair','The fog lifted'], answer:1},
+      {q:'What habit did Mojo have that upset Logan?', options:['Barking all night','Digging holes all over the land','Chasing the pines','Running away'], answer:1},
+      {q:'What was Logan\'s clever plan?', options:['To sell Mojo','To use the holes Mojo dug to plant pine trees','To fill in all the holes','To move to a new home'], answer:1},
+      {q:'Which Step 5.5 high-frequency word appears in this story?', options:['thought','family','woman','heart'], answer:1},
     ]
   },
 ];
 
-// ── TAP WARM-UP WORDS (per mission) ──
+// ── TAP WARM-UP WORDS (per mission) — authentic WRS Step 5 words ──
 const TAP_WORDS = [
-  [{word:'baby',count:2},{word:'penny',count:2},{word:'fly',count:1},{word:'tiny',count:2},{word:'funny',count:2},{word:'lazy',count:2}],
-  [{word:'silly',count:2},{word:'puppy',count:2},{word:'muddy',count:2},{word:'pony',count:2},{word:'kitty',count:2},{word:'foggy',count:2}],
-  [{word:'monkey',count:2},{word:'turkey',count:2},{word:'rocky',count:2},{word:'lucky',count:2},{word:'valley',count:2},{word:'honey',count:2}],
-  [{word:'candy',count:2},{word:'empty',count:2},{word:'windy',count:2},{word:'fancy',count:2},{word:'bumpy',count:2},{word:'dusty',count:2}],
-  [{word:'hurry',count:2},{word:'carry',count:2},{word:'sorry',count:2},{word:'merry',count:2},{word:'berry',count:2},{word:'ferry',count:2}],
+  // M1 · 5.3 open syllable -y intro
+  [{word:'baby',count:2},{word:'tiny',count:2},{word:'pony',count:2},{word:'lazy',count:2},{word:'navy',count:2},{word:'gravy',count:2}],
+  // M2 · 5.3 double consonant -y
+  [{word:'penny',count:2},{word:'silly',count:2},{word:'puppy',count:2},{word:'kitty',count:2},{word:'funny',count:2},{word:'muddy',count:2}],
+  // M3 · 5.4 -ey vs -y mixed
+  [{word:'monkey',count:2},{word:'turkey',count:2},{word:'valley',count:2},{word:'honey',count:2},{word:'rocky',count:2},{word:'lucky',count:2}],
+  // M4 · 5.4 consonant clusters + -y
+  [{word:'candy',count:2},{word:'empty',count:2},{word:'fancy',count:2},{word:'handy',count:2},{word:'windy',count:2},{word:'bumpy',count:2}],
+  // M5 · 5.5 rr-doubling + mixed mastery
+  [{word:'worry',count:2},{word:'hurry',count:2},{word:'carry',count:2},{word:'sorry',count:2},{word:'family',count:3},{word:'early',count:2}],
 ];
 
-// ── SORT WORDS (per mission) ──
+// ── SORT WORDS (per mission) — authentic WRS open vs double pairs ──
 const SORT_SETS = [
+  // M1 · 5.3 intro — open vs double
   [{word:'baby',type:'open'},{word:'penny',type:'double'},{word:'pony',type:'open'},{word:'funny',type:'double'},{word:'tiny',type:'open'},{word:'puppy',type:'double'}],
+  // M2 · 5.3 deeper double practice
   [{word:'lazy',type:'open'},{word:'jelly',type:'double'},{word:'cozy',type:'open'},{word:'muddy',type:'double'},{word:'gravy',type:'open'},{word:'kitty',type:'double'}],
+  // M3 · 5.4 -ey exception vs -y rule
   [{word:'monkey',type:'open'},{word:'rocky',type:'double'},{word:'valley',type:'open'},{word:'lucky',type:'double'},{word:'honey',type:'open'},{word:'foggy',type:'double'}],
-  [{word:'candy',type:'double'},{word:'baby',type:'open'},{word:'empty',type:'double'},{word:'navy',type:'open'},{word:'dusty',type:'double'},{word:'gravy',type:'open'}],
-  [{word:'hurry',type:'double'},{word:'honey',type:'open'},{word:'sorry',type:'double'},{word:'pony',type:'open'},{word:'merry',type:'double'},{word:'turkey',type:'open'}],
+  // M4 · 5.4 clusters vs open
+  [{word:'candy',type:'double'},{word:'baby',type:'open'},{word:'empty',type:'double'},{word:'navy',type:'open'},{word:'fancy',type:'double'},{word:'gravy',type:'open'}],
+  // M5 · 5.5 rr-doubling vs open mixed
+  [{word:'worry',type:'double'},{word:'honey',type:'open'},{word:'sorry',type:'double'},{word:'pony',type:'open'},{word:'hurry',type:'double'},{word:'turkey',type:'open'}],
 ];
 
-// ── SPELL DECKS (per mission, 10 words) ──
+// ── SPELL DECKS (per mission, 10 words) — from WRS 5.3–5.5 word lists ──
 const SPELL_DECKS = [
-  // M1: 5.3 intro — mix open and double
+  // M1: 5.3 open syllable -y intro — from WRS 5.3 AB syllable division list
   ['baby','pony','penny','puppy','tiny','funny','lady','jelly','cozy','silly'],
-  // M2: 5.3 double focus
-  ['kitty','muddy','nutty','foggy','dizzy','bunny','happy','muddy','funny','penny'],
-  // M3: 5.4 -ey vs -y
+  // M2: 5.3 double consonant focus — from WRS 5.3 A/B double consonants list
+  ['kitty','muddy','nutty','foggy','dizzy','bunny','happy','jolly','hobby','dizzy'],
+  // M3: 5.4 -ey vs -y — from WRS 5.4 mixed + 5.3 double
   ['monkey','turkey','rocky','lucky','valley','sticky','honey','money','foggy','dizzy'],
-  // M4: 5.4 clusters
-  ['candy','empty','fancy','handy','windy','bumpy','dusty','rusty','rocky','lucky'],
-  // M5: 5.5 final
-  ['worry','hurry','carry','sorry','merry','berry','ferry','honey','lucky','foggy'],
+  // M4: 5.4 consonant clusters — from WRS 5.3 B syllable division list
+  ['candy','empty','fancy','handy','windy','bumpy','dusty','rusty','clumsy','pansy'],
+  // M5: 5.5 rr-doubling + mixed mastery
+  ['worry','hurry','carry','sorry','merry','berry','honey','lucky','foggy','candy'],
 ];
 
 // Build spell word objects from deck list
