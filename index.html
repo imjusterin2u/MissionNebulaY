@@ -1091,7 +1091,7 @@ function buildScoopDisplay(syllables){
     const scoop=`<svg viewBox="0 0 ${w} 18" width="${w}" height="18"><path d="M4,2 Q${w/2},16 ${w-4},2" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round"/></svg>`;
     const divider=i<syllables.length-1?`<div class="syl-divider">/</div>`:'';
     return `<div class="syllable-block">
-      <div class="syl-marks">${s.vowelMark?`<span style="color:${isOpen?'#00e5ff':'#ffb300'}">${s.vowelMark}</span>`:''}${yBadge}</div>
+      <div class="syl-marks">${s.vowelMark&&!s.ySound?`<span style="color:${isOpen?'#00e5ff':'#ffb300'}">${s.vowelMark}</span>`:''}${yBadge}</div>
       <div class="syl-text">${s.text}</div>
       <div class="syl-scoop" style="width:${w}px;height:18px">${scoop}</div>
       <div class="syl-type ${isOpen?'open-syl':'closed-syl'}">${isOpen?'open':'closed'}</div>
