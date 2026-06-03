@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mission: Nebula-Y</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --space:#07091a;--space2:#0d1130;--space3:#131840;
+  --purple:#b06cff;--purple-glow:rgba(176,108,255,0.35);
+  --p2:#ff9de2;--p2-glow:rgba(255,157,226,0.35);
+  --cyan:#00e5ff;--cyan-glow:rgba(0,229,255,0.3);
+  --green:#39ff7a;--green-glow:rgba(57,255,122,0.3);
+  --amber:#ffb300;--amber-glow:rgba(255,179,0,0.3);
+  --red:#ff4e6a;--red-glow:rgba(255,78,106,0.3);
+  --text:#e8eeff;--muted:#7a85b0;--border:rgba(255,255,255,0.08);
+  --radius:14px;
+}
+body{font-family:'Exo 2',sans-serif;background:var(--space);color:var(--text);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(80,0,160,0.15) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(0,100,200,0.12) 0%,transparent 50%),radial-gradient(ellipse at 60% 80%,rgba(0,160,120,0.08) 0%,transparent 50%);pointer-events:none;z-index:0;}
+.stars{position:fixed;inset:0;pointer-events:none;z-index:0;}
+.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle var(--dur,3s) ease-in-out infinite var(--delay,0s);}
+@keyframes twinkle{0%,100%{opacity:0.2}50%{opacity:1}}
+.wrap{position:relative;z-index:1;padding:1rem;max-width:620px;margin:0 auto;}
+
+/* SCREEN SYSTEM */
+.screen{display:none;}
+.screen.active{display:block;}
+
+/* ── SETUP ── */
+.mission-logo{text-align:center;padding:2rem 0 1.5rem;}
+.mission-logo .pre{font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:0.25em;color:var(--cyan);text-transform:uppercase;margin-bottom:0.4rem;}
+.mission-logo h1{font-family:'Orbitron',monospace;font-size:1.8rem;font-weight:900;background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1;}
+.mission-logo .sub{font-size:0.85rem;color:var(--muted);margin-top:0.4rem;letter-spacing:0.08em;}
+.setup-panel{background:rgba(13,17,48,0.8);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1rem;backdrop-filter:blur(8px);}
+.setup-panel h2{font-family:'Orbitron',monospace;font-size:0.75rem;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase;margin-bottom:1.25rem;}
+.token-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.token-btn{background:rgba(255,255,255,0.04);border:1.5px solid var(--border);border-radius:var(--radius);padding:0.75rem 0.4rem;text-align:center;cursor:pointer;transition:all 0.2s;}
+.token-btn:hover{background:rgba(255,255,255,0.08);border-color:var(--purple);}
+.token-btn.selected{background:rgba(176,108,255,0.15);border-color:var(--purple);box-shadow:0 0 12px var(--purple-glow);}
+.token-icon{font-size:1.6rem;display:block;margin-bottom:4px;}
+.token-name{font-family:'Orbitron',monospace;font-size:0.6rem;color:var(--muted);letter-spacing:0.1em;}
+.token-btn.selected .token-name{color:var(--purple);}
+.field{margin-bottom:1rem;}
+.field label{display:block;font-family:'Orbitron',monospace;font-size:0.65rem;letter-spacing:0.18em;color:var(--muted);text-transform:uppercase;margin-bottom:0.5rem;}
+.field input{width:100%;padding:0.7rem 1rem;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Exo 2',sans-serif;font-size:1rem;font-weight:600;outline:none;transition:border-color 0.2s;}
+.field input:focus{border-color:var(--cyan);box-shadow:0 0 10px var(--cyan-glow);}
+.btn-launch{width:100%;padding:1rem;background:linear-gradient(135deg,rgba(176,108,255,0.3),rgba(0,229,255,0.2));border:1px solid var(--purple);border-radius:var(--radius);color:#fff;font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:700;letter-spacing:0.12em;cursor:pointer;transition:all 0.2s;box-shadow:0 0 20px var(--purple-glow);}
+.btn-launch:hover{box-shadow:0 0 30px var(--purple-glow);transform:translateY(-1px);}
+
+/* ── CAMPAIGN MAP ── */
+.campaign-header{text-align:center;padding:1.5rem 0 1rem;}
+.campaign-header h2{font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:900;background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.campaign-header .pilot-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:0.5rem;}
+.pilot-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(176,108,255,0.1);border:1px solid var(--purple);border-radius:99px;padding:4px 12px;font-family:'Orbitron',monospace;font-size:0.7rem;color:var(--purple);}
+.aria-chip{background:rgba(255,78,106,0.1);border-color:var(--red);color:var(--red);}
+.mission-list{display:flex;flex-direction:column;gap:12px;margin-bottom:1.5rem;}
+.mission-card{background:rgba(13,17,48,0.8);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;}
+.mission-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.2s;background:radial-gradient(ellipse at 30% 50%,rgba(176,108,255,0.1) 0%,transparent 70%);}
+.mission-card:hover:not(.locked)::before{opacity:1;}
+.mission-card:hover:not(.locked){border-color:var(--purple);transform:translateY(-1px);}
+.mission-card.locked{opacity:0.45;cursor:not-allowed;}
+.mission-card.completed{border-color:var(--green);background:rgba(57,255,122,0.04);}
+.mission-card.active-mission{border-color:var(--cyan);box-shadow:0 0 16px var(--cyan-glow);}
+.mc-top{display:flex;align-items:center;gap:12px;}
+.mc-num{font-family:'Orbitron',monospace;font-size:1.4rem;font-weight:900;color:var(--muted);min-width:36px;}
+.mission-card.completed .mc-num{color:var(--green);}
+.mission-card.active-mission .mc-num{color:var(--cyan);}
+.mc-info{flex:1;}
+.mc-title{font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:700;color:var(--text);margin-bottom:3px;}
+.mc-sub{font-size:0.78rem;color:var(--muted);}
+.mc-badge{font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:0.1em;padding:3px 10px;border-radius:99px;border:1px solid var(--border);color:var(--muted);}
+.mission-card.completed .mc-badge{border-color:var(--green);color:var(--green);background:rgba(57,255,122,0.1);}
+.mission-card.locked .mc-badge{border-color:var(--muted);}
+.mc-steps{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;}
+.step-dot{display:inline-block;font-family:'Orbitron',monospace;font-size:0.55rem;padding:2px 7px;border-radius:99px;border:1px solid var(--border);color:var(--muted);}
+.step-dot.done{border-color:var(--green);color:var(--green);background:rgba(57,255,122,0.08);}
+.campaign-vs{display:flex;align-items:center;gap:8px;background:rgba(255,78,106,0.07);border:1px solid rgba(255,78,106,0.2);border-radius:var(--radius);padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.82rem;color:#ff8a9a;}
+.campaign-vs .aria-icon{font-size:1.2rem;}
+.aria-score-bar{margin-bottom:1.5rem;}
+.aria-label{display:flex;justify-content:space-between;font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:0.1em;color:var(--muted);margin-bottom:4px;}
+.score-track{height:8px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;display:flex;}
+.score-track .pilot-bar{height:100%;background:linear-gradient(90deg,var(--purple),var(--cyan));border-radius:99px 0 0 99px;transition:width 0.5s ease;}
+.score-track .aria-bar{height:100%;background:linear-gradient(90deg,var(--red),var(--amber));border-radius:0 99px 99px 0;transition:width 0.5s ease;}
+
+/* ── STAGE SCREENS ── */
+.stage-header{display:flex;align-items:center;gap:10px;margin-bottom:1rem;}
+.back-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--muted);font-family:'Orbitron',monospace;font-size:0.6rem;cursor:pointer;transition:all 0.2s;}
+.back-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.stage-title{font-family:'Orbitron',monospace;font-size:0.8rem;font-weight:700;color:var(--text);}
+.stage-sub{font-size:0.7rem;color:var(--muted);}
+.stage-progress{display:flex;gap:4px;margin-bottom:1rem;}
+.sp-dot{flex:1;height:4px;background:rgba(255,255,255,0.08);border-radius:99px;transition:background 0.3s;}
+.sp-dot.done{background:var(--green);}
+.sp-dot.current{background:var(--cyan);}
+
+/* ── BRIEFING STAGE ── */
+.briefing-card{background:rgba(13,17,48,0.85);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1rem;backdrop-filter:blur(8px);}
+.briefing-badge{display:inline-flex;align-items:center;gap:6px;font-family:'Orbitron',monospace;font-size:0.65rem;letter-spacing:0.12em;padding:5px 12px;border-radius:99px;margin-bottom:1rem;}
+.bb-cyan{background:rgba(0,229,255,0.1);border:1px solid var(--cyan);color:var(--cyan);}
+.bb-amber{background:rgba(255,179,0,0.1);border:1px solid var(--amber);color:var(--amber);}
+.bb-purple{background:rgba(176,108,255,0.1);border:1px solid var(--purple);color:var(--purple);}
+.briefing-card h3{font-family:'Orbitron',monospace;font-size:0.95rem;font-weight:700;color:var(--text);margin-bottom:0.75rem;}
+.briefing-card p{font-size:0.88rem;color:var(--text);line-height:1.7;margin-bottom:0.75rem;}
+.briefing-card p:last-child{margin-bottom:0;}
+.concept-box{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:1rem;margin:0.75rem 0;}
+.concept-box .cb-title{font-family:'Orbitron',monospace;font-size:0.65rem;letter-spacing:0.15em;color:var(--cyan);margin-bottom:0.5rem;text-transform:uppercase;}
+.concept-box .examples{display:flex;flex-wrap:wrap;gap:6px;margin-top:0.5rem;}
+.word-pill{display:inline-block;font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:700;padding:4px 12px;border-radius:99px;border:1px solid var(--border);background:rgba(255,255,255,0.04);}
+.wp-open{border-color:var(--cyan);color:var(--cyan);background:rgba(0,229,255,0.08);}
+.wp-double{border-color:var(--amber);color:var(--amber);background:rgba(255,179,0,0.08);}
+.wp-single{border-color:var(--purple);color:var(--purple);background:rgba(176,108,255,0.08);}
+
+/* ── SYLLABLE TAP ── */
+.tap-word-display{text-align:center;padding:2rem 1rem;background:rgba(13,17,48,0.85);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:1rem;}
+.tap-word{font-family:'Orbitron',monospace;font-size:2.8rem;font-weight:900;color:#fff;letter-spacing:3px;cursor:pointer;user-select:none;transition:transform 0.1s;}
+.tap-word.tapped{transform:scale(1.05);}
+.tap-count{font-family:'Orbitron',monospace;font-size:1rem;color:var(--cyan);margin-top:0.75rem;}
+.tap-hint{font-size:0.8rem;color:var(--muted);margin-top:0.4rem;}
+.tap-options{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem;}
+.tap-opt{background:rgba(13,17,48,0.8);border:1.5px solid var(--border);border-radius:var(--radius);padding:0.75rem;font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;color:var(--text);cursor:pointer;transition:all 0.15s;text-align:center;}
+.tap-opt:hover:not(:disabled){border-color:var(--purple);background:rgba(176,108,255,0.1);}
+.tap-opt.correct{background:rgba(57,255,122,0.15);border-color:var(--green);color:var(--green);}
+.tap-opt.wrong{background:rgba(255,78,106,0.12);border-color:var(--red);color:var(--red);}
+.tap-feedback{min-height:40px;border-radius:var(--radius);padding:0.6rem 1rem;margin-bottom:1rem;text-align:center;font-size:0.83rem;}
+.tap-fb-neutral{color:var(--muted);font-style:italic;}
+.tap-fb-correct{background:rgba(57,255,122,0.08);border:1px solid var(--green);color:var(--green);}
+.tap-fb-wrong{background:rgba(255,78,106,0.08);border:1px solid var(--red);color:#ff8a9a;}
+.tap-progress{display:flex;justify-content:space-between;align-items:center;font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--muted);margin-bottom:0.75rem;}
+
+/* ── WORD SORT ── */
+.sort-instructions{background:rgba(13,17,48,0.8);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-bottom:1rem;font-size:0.83rem;color:var(--muted);text-align:center;}
+.sort-instructions strong{color:var(--cyan);font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:0.08em;}
+.sort-bank{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;min-height:52px;background:rgba(255,255,255,0.02);border:1px dashed var(--border);border-radius:var(--radius);padding:0.75rem;margin-bottom:1rem;}
+.sort-word{font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:700;padding:7px 14px;border-radius:99px;border:1.5px solid var(--border);background:rgba(255,255,255,0.05);cursor:grab;user-select:none;transition:all 0.15s;}
+.sort-word:hover{border-color:var(--purple);transform:scale(1.04);}
+.sort-word.dragging{opacity:0.4;}
+.sort-word.correct-placed{border-color:var(--green);background:rgba(57,255,122,0.1);color:var(--green);}
+.sort-word.wrong-placed{border-color:var(--red);background:rgba(255,78,106,0.1);color:var(--red);animation:shake 0.35s ease;}
+.sort-columns{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem;}
+.sort-col{border-radius:var(--radius);border:2px dashed;min-height:120px;padding:0.75rem;}
+.sort-col-open{border-color:rgba(0,229,255,0.3);background:rgba(0,229,255,0.04);}
+.sort-col-double{border-color:rgba(255,179,0,0.3);background:rgba(255,179,0,0.04);}
+.sort-col.drag-over{border-style:solid;}
+.sort-col-open.drag-over{border-color:var(--cyan);}
+.sort-col-double.drag-over{border-color:var(--amber);}
+.sort-col-header{font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:0.1em;margin-bottom:0.5rem;display:flex;align-items:center;gap:6px;}
+.sort-col-open .sort-col-header{color:var(--cyan);}
+.sort-col-double .sort-col-header{color:var(--amber);}
+.sort-col-body{display:flex;flex-wrap:wrap;gap:6px;min-height:60px;}
+.sort-result{text-align:center;background:rgba(13,17,48,0.85);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-bottom:1rem;font-size:0.85rem;}
+.sort-score{font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:900;color:var(--cyan);margin-bottom:0.25rem;}
+
+/* ── SPELLING CHALLENGE (game) ── */
+.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;gap:8px;}
+.pilot-tag{display:flex;align-items:center;gap:8px;background:rgba(176,108,255,0.1);border:1px solid var(--purple);border-radius:99px;padding:5px 14px 5px 8px;font-family:'Orbitron',monospace;font-size:0.7rem;color:var(--purple);}
+.pilot-tag .t-icon{font-size:1.1rem;}
+.aria-tag{background:rgba(255,78,106,0.1);border-color:var(--red);color:var(--red);}
+.scores{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem;}
+.score-tile{background:rgba(13,17,48,0.7);border:1px solid var(--border);border-radius:var(--radius);padding:0.75rem 1rem;text-align:center;}
+.score-tile.mine{border-color:var(--purple);box-shadow:0 0 12px var(--purple-glow);}
+.score-tile.aria{border-color:var(--red);box-shadow:0 0 8px var(--red-glow);}
+.score-tile .s-name{font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:0.15em;color:var(--muted);margin-bottom:4px;}
+.score-tile.mine .s-name{color:var(--purple);}
+.score-tile.aria .s-name{color:var(--red);}
+.score-tile .s-num{font-family:'Orbitron',monospace;font-size:1.8rem;font-weight:900;}
+.score-tile.mine .s-num{color:var(--purple);}
+.score-tile.aria .s-num{color:var(--red);}
+.orbit-label{display:inline-block;font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:0.15em;padding:4px 12px;border-radius:99px;margin-bottom:0.75rem;}
+.orbit-53{background:rgba(57,255,122,0.1);border:1px solid var(--green);color:var(--green);}
+.orbit-54{background:rgba(255,179,0,0.1);border:1px solid var(--amber);color:var(--amber);}
+.orbit-55{background:rgba(176,108,255,0.1);border:1px solid var(--purple);color:var(--purple);}
+.reentry-badge{display:inline-block;font-family:'Orbitron',monospace;font-size:0.58rem;letter-spacing:0.12em;padding:3px 10px;border-radius:99px;background:rgba(255,78,106,0.15);border:1px solid var(--red);color:var(--red);margin-left:6px;}
+.word-card{background:rgba(13,17,48,0.85);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;text-align:center;margin-bottom:1rem;backdrop-filter:blur(8px);position:relative;overflow:hidden;}
+.word-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(176,108,255,0.08) 0%,transparent 70%);pointer-events:none;}
+.word-stem{font-family:'Orbitron',monospace;font-size:2.4rem;font-weight:900;color:#fff;letter-spacing:2px;margin-bottom:0.5rem;}
+.word-hint{font-size:0.8rem;color:var(--muted);font-style:italic;}
+.orbit-hint{display:inline-flex;align-items:center;gap:6px;margin-top:0.75rem;padding:5px 12px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:99px;font-size:0.75rem;color:var(--muted);}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;}
+.choice-btn{background:rgba(13,17,48,0.8);border:1.5px solid rgba(255,255,255,0.12);border-radius:var(--radius);padding:0.9rem 0.5rem;font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:700;color:var(--text);cursor:pointer;transition:all 0.15s;}
+.choice-btn:hover:not(:disabled){background:rgba(176,108,255,0.12);border-color:var(--purple);transform:translateY(-2px);}
+.choice-btn:disabled{cursor:default;}
+.choice-btn.correct{background:rgba(57,255,122,0.15);border-color:var(--green);color:var(--green);}
+.choice-btn.wrong{background:rgba(255,78,106,0.15);border-color:var(--red);color:var(--red);}
+.choice-btn.reveal{background:rgba(57,255,122,0.1);border-color:var(--green);color:var(--green);}
+.feedback{min-height:52px;border-radius:var(--radius);padding:0.75rem 1rem;margin-bottom:1rem;text-align:center;font-size:0.85rem;}
+.feedback.neutral{color:var(--muted);font-style:italic;}
+.feedback.correct{background:rgba(57,255,122,0.1);border:1px solid var(--green);color:var(--green);}
+.feedback.wrong-fb{background:rgba(255,78,106,0.1);border:1px solid var(--red);color:#ff8a9a;}
+.feedback .rule-label{font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:0.1em;display:block;margin-bottom:3px;}
+.trajectory{margin-bottom:1rem;}
+.traj-track{height:4px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden;}
+.traj-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--purple),var(--cyan));transition:width 0.5s ease;}
+.traj-labels{display:flex;justify-content:space-between;margin-top:4px;}
+.traj-labels span{font-family:'Orbitron',monospace;font-size:0.55rem;color:var(--muted);}
+.next-btn{width:100%;padding:0.85rem;background:transparent;border:1px solid rgba(255,255,255,0.15);border-radius:var(--radius);color:var(--text);font-family:'Orbitron',monospace;font-size:0.75rem;letter-spacing:0.12em;cursor:pointer;display:none;transition:all 0.2s;margin-top:0.5rem;}
+.next-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+
+/* ARIA-7 "thinking" indicator */
+.aria-thinking{display:none;align-items:center;gap:8px;padding:0.5rem 1rem;background:rgba(255,78,106,0.07);border:1px solid rgba(255,78,106,0.2);border-radius:99px;font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--red);margin-bottom:0.75rem;}
+.aria-thinking.show{display:flex;}
+.aria-dots span{display:inline-block;width:5px;height:5px;background:var(--red);border-radius:50%;animation:adot 1s ease-in-out infinite;}
+.aria-dots span:nth-child(2){animation-delay:0.2s;}
+.aria-dots span:nth-child(3){animation-delay:0.4s;}
+@keyframes adot{0%,80%,100%{opacity:0.2}40%{opacity:1}}
+
+/* ── ENGINE REPAIR PANEL ── */
+#repair-panel{display:none;margin-bottom:1rem;}
+.repair-card{background:rgba(255,78,106,0.06);border:1px solid var(--red);border-radius:var(--radius);padding:1.25rem;}
+.repair-title{font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:0.18em;color:var(--red);text-transform:uppercase;margin-bottom:1rem;}
+.scoop-display{display:flex;justify-content:center;align-items:flex-end;gap:0;margin-bottom:1rem;padding:0.5rem 0;}
+.syllable-block{display:flex;flex-direction:column;align-items:center;position:relative;padding:0 4px;}
+.syl-marks{font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--cyan);height:18px;display:flex;align-items:center;justify-content:center;gap:3px;margin-bottom:2px;}
+.syl-text{font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:900;color:#fff;letter-spacing:1px;}
+.syl-scoop{position:relative;overflow:visible;}
+.syl-scoop svg{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;}
+.syl-type{font-family:'Orbitron',monospace;font-size:0.55rem;letter-spacing:0.12em;margin-top:4px;}
+.syl-type.open-syl{color:var(--cyan);}
+.syl-type.closed-syl{color:var(--amber);}
+.syl-divider{font-family:'Orbitron',monospace;font-size:1.2rem;color:var(--muted);padding:0 2px;align-self:center;margin-bottom:12px;}
+.engine-rule{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:0.75rem;margin-bottom:1rem;font-size:0.82rem;color:var(--text);line-height:1.6;}
+.engine-rule strong{color:var(--cyan);font-family:'Orbitron',monospace;font-size:0.7rem;letter-spacing:0.08em;display:block;margin-bottom:4px;}
+.repair-input-wrap{position:relative;margin-bottom:0.75rem;}
+.repair-input{width:100%;padding:0.85rem 1rem;background:rgba(255,255,255,0.05);border:1.5px solid var(--red);border-radius:8px;color:var(--text);font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:700;letter-spacing:0.1em;outline:none;text-align:center;transition:border-color 0.2s;}
+.repair-input.input-ok{border-color:var(--green);box-shadow:0 0 10px var(--green-glow);}
+.repair-input.input-err{border-color:var(--red);animation:shake 0.35s ease;}
+.repair-hint{font-size:0.78rem;color:var(--muted);text-align:center;min-height:20px;margin-bottom:0.75rem;}
+.repair-hint.hint-ok{color:var(--green);}
+.repair-hint.hint-err{color:var(--red);}
+.btn-repair{width:100%;padding:0.85rem;background:rgba(176,108,255,0.15);border:1px solid var(--purple);border-radius:var(--radius);color:var(--purple);font-family:'Orbitron',monospace;font-size:0.75rem;letter-spacing:0.12em;cursor:pointer;transition:all 0.2s;}
+.btn-repair:hover{background:rgba(176,108,255,0.25);}
+.btn-repair:disabled{opacity:0.4;cursor:default;}
+
+/* ── READING COMP ── */
+.passage-card{background:rgba(13,17,48,0.85);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem;backdrop-filter:blur(8px);}
+.passage-title{font-family:'Orbitron',monospace;font-size:0.75rem;letter-spacing:0.15em;color:var(--cyan);margin-bottom:0.75rem;text-transform:uppercase;}
+.passage-text{font-size:0.92rem;line-height:1.85;color:var(--text);}
+.passage-text .highlight{background:rgba(176,108,255,0.15);border-radius:4px;padding:0 3px;color:var(--purple);}
+.comp-question{background:rgba(13,17,48,0.8);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem;}
+.cq-num{font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:0.15em;color:var(--muted);margin-bottom:0.4rem;}
+.cq-text{font-size:0.9rem;color:var(--text);margin-bottom:0.9rem;line-height:1.5;}
+.comp-options{display:flex;flex-direction:column;gap:7px;}
+.comp-opt{background:rgba(255,255,255,0.04);border:1.5px solid var(--border);border-radius:10px;padding:0.7rem 1rem;font-size:0.85rem;color:var(--text);cursor:pointer;transition:all 0.15s;text-align:left;}
+.comp-opt:hover:not(:disabled){border-color:var(--purple);background:rgba(176,108,255,0.08);}
+.comp-opt.correct{background:rgba(57,255,122,0.1);border-color:var(--green);color:var(--green);}
+.comp-opt.wrong{background:rgba(255,78,106,0.08);border-color:var(--red);color:#ff8a9a;}
+.comp-opt:disabled{cursor:default;}
+
+/* ── DEBRIEF / BADGE ── */
+.debrief-card{background:rgba(13,17,48,0.9);border:1px solid var(--purple);border-radius:var(--radius);padding:2rem;text-align:center;box-shadow:0 0 30px var(--purple-glow);backdrop-filter:blur(8px);margin-bottom:1rem;}
+.badge-ring{width:100px;height:100px;border-radius:50%;border:3px solid var(--cyan);display:flex;align-items:center;justify-content:center;font-size:2.8rem;margin:0 auto 1rem;box-shadow:0 0 24px var(--cyan-glow);animation:pulse-ring 2s ease-in-out infinite;}
+@keyframes pulse-ring{0%,100%{box-shadow:0 0 16px var(--cyan-glow)}50%{box-shadow:0 0 36px var(--cyan-glow)}}
+.debrief-title{font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:900;color:var(--cyan);margin-bottom:0.25rem;}
+.debrief-sub{font-size:0.85rem;color:var(--muted);margin-bottom:1.5rem;}
+.debrief-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem;}
+.ds-tile{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:var(--radius);padding:0.85rem 0.5rem;text-align:center;}
+.ds-val{font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:900;color:var(--text);}
+.ds-lbl{font-family:'Orbitron',monospace;font-size:0.55rem;letter-spacing:0.1em;color:var(--muted);margin-top:3px;}
+.vs-result{background:rgba(255,78,106,0.07);border:1px solid rgba(255,78,106,0.25);border-radius:var(--radius);padding:1rem;margin-bottom:1rem;}
+.vs-row{display:flex;justify-content:space-between;align-items:center;font-family:'Orbitron',monospace;font-size:0.8rem;margin-bottom:6px;}
+.vs-winner{color:var(--green);}
+.vs-loser{color:var(--muted);}
+.btn-csv{width:100%;padding:0.8rem;background:rgba(57,255,122,0.1);border:1px solid var(--green);border-radius:var(--radius);color:var(--green);font-family:'Orbitron',monospace;font-size:0.75rem;letter-spacing:0.12em;cursor:pointer;transition:all 0.2s;margin-bottom:0.75rem;}
+.btn-csv:hover{background:rgba(57,255,122,0.2);}
+.btn-next-mission{width:100%;padding:1rem;background:linear-gradient(135deg,rgba(176,108,255,0.3),rgba(0,229,255,0.2));border:1px solid var(--purple);border-radius:var(--radius);color:#fff;font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:700;letter-spacing:0.12em;cursor:pointer;box-shadow:0 0 20px var(--purple-glow);transition:all 0.2s;}
+.btn-next-mission:hover{box-shadow:0 0 30px var(--purple-glow);transform:translateY(-1px);}
+.btn-back-map{width:100%;padding:0.75rem;background:transparent;border:1px solid var(--border);border-radius:var(--radius);color:var(--muted);font-family:'Orbitron',monospace;font-size:0.7rem;cursor:pointer;margin-top:0.5rem;transition:all 0.2s;}
+.btn-back-map:hover{border-color:var(--cyan);color:var(--cyan);}
+
+/* ── PILOT LOG ── */
+.log-card{background:rgba(13,17,48,0.85);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem;}
+.log-entry{display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0;border-bottom:1px solid var(--border);}
+.log-entry:last-child{border-bottom:none;}
+.le-left{font-size:0.82rem;color:var(--text);}
+.le-left .le-mission{font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--muted);margin-bottom:2px;}
+.le-right{font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:700;color:var(--cyan);}
+
+/* UTILS */
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.btn-action{padding:0.75rem 1.5rem;background:rgba(0,229,255,0.1);border:1px solid var(--cyan);border-radius:var(--radius);color:var(--cyan);font-family:'Orbitron',monospace;font-size:0.75rem;letter-spacing:0.1em;cursor:pointer;transition:all 0.2s;}
+.btn-action:hover{background:rgba(0,229,255,0.2);}
+.btn-row{display:flex;gap:8px;margin-top:0.75rem;}
+.btn-row .btn-action{flex:1;}
+.section-label{font-family:'Orbitron',monospace;font-size:0.65rem;letter-spacing:0.18em;color:var(--muted);text-transform:uppercase;margin-bottom:0.6rem;}
+
+@media(max-width:400px){
+  .word-stem{font-size:1.8rem;}
+  .choice-btn{font-size:0.9rem;padding:0.75rem 0.3rem;}
+  .syl-text{font-size:1.1rem;}
+  .debrief-stats{grid-template-columns:1fr 1fr;}
+}
+
+/* ── MULTIPLAYER ── */
+.mode-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem;}
+.mode-tab{background:rgba(255,255,255,0.04);border:1.5px solid var(--border);border-radius:var(--radius);padding:0.75rem 0.4rem;text-align:center;cursor:pointer;transition:all 0.2s;}
+.mode-tab:hover{border-color:var(--purple);}
+.mode-tab.selected{background:rgba(176,108,255,0.15);border-color:var(--purple);box-shadow:0 0 12px var(--purple-glow);}
+.mode-tab .mt-icon{font-size:1.4rem;display:block;margin-bottom:4px;}
+.mode-tab .mt-label{font-family:'Orbitron',monospace;font-size:0.55rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;}
+.mode-tab.selected .mt-label{color:var(--purple);}
+.p2-panel{display:none;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);}
+.p2-panel.show{display:block;}
+.p2-tokens .token-btn.selected{background:rgba(255,157,226,0.15);border-color:var(--p2);box-shadow:0 0 12px var(--p2-glow);}
+.p2-tokens .token-btn.selected .token-name{color:var(--p2);}
+.p2-label{font-family:'Orbitron',monospace;font-size:0.65rem;letter-spacing:0.15em;color:var(--p2);text-transform:uppercase;margin-bottom:0.5rem;}
+.session-panel{display:none;margin-top:1rem;padding:1rem;background:rgba(0,229,255,0.04);border:1px solid rgba(0,229,255,0.2);border-radius:var(--radius);}
+.session-panel.show{display:block;}
+.session-code{font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;color:var(--cyan);letter-spacing:0.3em;text-align:center;padding:0.75rem;background:rgba(0,229,255,0.08);border-radius:8px;margin:0.5rem 0 0.75rem;}
+.aria-toggle{display:flex;align-items:center;gap:10px;padding:0.75rem 1rem;background:rgba(255,78,106,0.06);border:1px solid rgba(255,78,106,0.2);border-radius:var(--radius);margin-top:1rem;cursor:pointer;user-select:none;}
+.aria-toggle input{width:18px;height:18px;accent-color:var(--red);cursor:pointer;}
+.aria-toggle label{font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--muted);letter-spacing:0.1em;cursor:pointer;}
+/* handoff overlay */
+.handoff-overlay{display:none;position:fixed;inset:0;background:rgba(7,9,26,0.96);z-index:999;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:2rem;}
+.handoff-overlay.show{display:flex;}
+.handoff-icon{font-size:4rem;margin-bottom:1rem;}
+.handoff-title{font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:900;color:var(--text);margin-bottom:0.5rem;}
+.handoff-sub{font-size:0.85rem;color:var(--muted);margin-bottom:2rem;line-height:1.5;}
+.handoff-p2{color:var(--p2);}
+.btn-handoff{padding:1rem 2rem;background:rgba(176,108,255,0.2);border:1px solid var(--purple);border-radius:var(--radius);color:var(--text);font-family:'Orbitron',monospace;font-size:0.85rem;font-weight:700;letter-spacing:0.1em;cursor:pointer;transition:all 0.2s;}
+.btn-handoff:hover{box-shadow:0 0 20px var(--purple-glow);}
+/* active pilot banner */
+.active-pilot-banner{padding:0.5rem 1rem;border-radius:99px;font-family:'Orbitron',monospace;font-size:0.65rem;font-weight:700;letter-spacing:0.12em;text-align:center;margin-bottom:0.75rem;display:none;}
+.apb-p1{display:block;background:rgba(176,108,255,0.15);border:1px solid var(--purple);color:var(--purple);}
+.apb-p2{display:block;background:rgba(255,157,226,0.15);border:1px solid var(--p2);color:var(--p2);}
+/* pilot chip P2 */
+.pilot-chip.p2-chip{background:rgba(255,157,226,0.1);border-color:var(--p2);color:var(--p2);}
+/* score tiles 3-col */
+.scores.sc3{grid-template-columns:1fr 1fr 1fr;}
+.score-tile.p2{background:rgba(255,157,226,0.08);border-color:var(--p2);}
+.score-tile.p2 .s-name{color:var(--p2);}
+.score-tile.p2 .s-num{color:var(--p2);}
+/* vs result P2 row */
+.vs-row.p2-row{color:var(--p2);}
+</style>
+</head>
+<body>
+<div class="stars" id="stars"></div>
+<div class="wrap">
+
+<!-- ═══ SETUP ═══ -->
+<div id="screen-setup" class="screen active">
+  <div class="mission-logo">
+    <div class="pre">Mission Briefing</div>
+    <h1>Nebula-Y</h1>
+    <div class="sub">Navigate the syllable nebula · Reach the y Moon</div>
+  </div>
+
+  <!-- MODE SELECTOR -->
+  <div class="setup-panel">
+    <h2>Choose mission mode</h2>
+    <div class="mode-tabs">
+      <div class="mode-tab selected" data-mode="solo" onclick="selectMode(this)">
+        <span class="mt-icon">🧑‍🚀</span><span class="mt-label">Solo vs<br>ARIA-7</span>
+      </div>
+      <div class="mode-tab" data-mode="local" onclick="selectMode(this)">
+        <span class="mt-icon">👫</span><span class="mt-label">Pass &amp;<br>Play</span>
+      </div>
+      <div class="mode-tab" data-mode="device" onclick="selectMode(this)">
+        <span class="mt-icon">📲</span><span class="mt-label">2 Devices<br>(Code)</span>
+      </div>
+    </div>
+    <!-- ARIA-7 toggle (hidden in solo, shown in 2P modes) -->
+    <div class="aria-toggle" id="aria-toggle-wrap" style="display:none" onclick="toggleAria()">
+      <input type="checkbox" id="aria-on-check" checked/>
+      <label for="aria-on-check">🤖 Include ARIA-7 as a third rival</label>
+    </div>
+    <!-- 2-device session panel -->
+    <div class="session-panel" id="session-panel">
+      <div class="section-label">Session Code</div>
+      <div class="session-code" id="session-code-display">—</div>
+      <button class="btn-action" style="width:100%;margin-bottom:0.75rem" onclick="genSessionCode()">↻ Generate New Code</button>
+      <div class="section-label" style="margin-top:0.5rem">Or join with a code</div>
+      <div class="field" style="margin-top:0.5rem;margin-bottom:0"><label>Enter code</label><input type="text" id="join-code-input" placeholder="e.g. NOVA42" maxlength="8" autocomplete="off" style="text-transform:uppercase"/></div>
+      <div style="font-size:0.72rem;color:var(--muted);margin-top:0.4rem">⚠️ Note: 2-device sync is simulated in this demo. Both players play independently and scores are compared at debrief.</div>
+    </div>
+  </div>
+
+  <!-- PLAYER 1 SETUP -->
+  <div class="setup-panel">
+    <h2>Player 1 · Pilot setup</h2>
+    <div class="token-grid" id="p1-tokens">
+      <button class="token-btn selected" data-token="🚀" onclick="selectToken(1,this)"><span class="token-icon">🚀</span><span class="token-name">Rocket</span></button>
+      <button class="token-btn" data-token="🛸" onclick="selectToken(1,this)"><span class="token-icon">🛸</span><span class="token-name">Shuttle</span></button>
+      <button class="token-btn" data-token="📡" onclick="selectToken(1,this)"><span class="token-icon">📡</span><span class="token-name">Satellite</span></button>
+      <button class="token-btn" data-token="🤖" onclick="selectToken(1,this)"><span class="token-icon">🤖</span><span class="token-name">Rover</span></button>
+    </div>
+    <div class="field" style="margin-top:1rem;margin-bottom:0"><label>Pilot 1 name</label><input type="text" id="player-name" placeholder="Enter your name" maxlength="20" autocomplete="off"/></div>
+  </div>
+
+  <!-- PLAYER 2 SETUP (shown in 2P modes) -->
+  <div class="setup-panel p2-panel" id="p2-panel">
+    <h2 class="p2-label">Player 2 · Co-pilot setup</h2>
+    <div class="token-grid p2-tokens" id="p2-tokens">
+      <button class="token-btn" data-token="🚀" onclick="selectToken(2,this)"><span class="token-icon">🚀</span><span class="token-name">Rocket</span></button>
+      <button class="token-btn" data-token="🛸" onclick="selectToken(2,this)"><span class="token-icon">🛸</span><span class="token-name">Shuttle</span></button>
+      <button class="token-btn selected" data-token="📡" onclick="selectToken(2,this)"><span class="token-icon">📡</span><span class="token-name">Satellite</span></button>
+      <button class="token-btn" data-token="🤖" onclick="selectToken(2,this)"><span class="token-icon">🤖</span><span class="token-name">Rover</span></button>
+    </div>
+    <div class="field" style="margin-top:1rem;margin-bottom:0"><label class="p2-label">Pilot 2 name</label><input type="text" id="player2-name" placeholder="Enter co-pilot name" maxlength="20" autocomplete="off"/></div>
+  </div>
+
+  <button class="btn-launch" id="btn-launch" onclick="startCampaign()">🚀 Launch Solo Campaign</button>
+</div>
+
+<!-- ═══ HANDOFF OVERLAY ═══ -->
+<div class="handoff-overlay" id="handoff-overlay">
+  <div class="handoff-icon" id="handoff-icon">👫</div>
+  <div class="handoff-title" id="handoff-title">Pass the device</div>
+  <div class="handoff-sub" id="handoff-sub">It's your turn, pilot!</div>
+  <button class="btn-handoff" id="btn-handoff" onclick="dismissHandoff()">I'M READY →</button>
+</div>
+
+<!-- ═══ CAMPAIGN MAP ═══ -->
+<div id="screen-map" class="screen">
+  <div class="campaign-header">
+    <h2>Mission: Nebula-Y</h2>
+    <div class="pilot-row">
+      <div class="pilot-chip"><span id="map-pilot-icon">🚀</span><span id="map-pilot-name">Pilot</span></div>
+      <div class="pilot-chip p2-chip" id="map-p2-chip" style="display:none"><span>📡</span><span>Co-Pilot</span></div>
+      <div class="pilot-chip aria-chip" id="map-aria-chip">🤖 ARIA-7 · Rival</div>
+    </div>
+  </div>
+  <div class="campaign-vs">
+    <span class="aria-icon">🤖</span>
+    <span id="aria-taunt">ARIA-7 is watching your every move, pilot. Prove your phonetic accuracy.</span>
+  </div>
+  <div class="aria-score-bar">
+    <div class="aria-label"><span id="pilot-total-label">YOU · 0 pts</span><span id="aria-total-label">ARIA-7 · 0 pts</span></div>
+    <div class="score-track">
+      <div class="pilot-bar" id="campaign-pilot-bar" style="width:50%"></div>
+      <div class="aria-bar" id="campaign-aria-bar" style="width:50%"></div>
+    </div>
+  </div>
+  <div class="mission-list" id="mission-list"></div>
+  <div style="text-align:center">
+    <button class="btn-action" onclick="showScreen('screen-log')" style="margin:0 auto">📋 View Pilot Log</button>
+  </div>
+</div>
+
+<!-- ═══ BRIEFING STAGE ═══ -->
+<div id="screen-briefing" class="screen">
+  <div class="stage-header">
+    <button class="back-btn" onclick="showScreen('screen-map')">← MAP</button>
+    <div><div class="stage-title" id="brief-mission-title">Mission 1</div><div class="stage-sub">Stage 1 of 5 · Concept Briefing</div></div>
+  </div>
+  <div class="stage-progress">
+    <div class="sp-dot current" id="sp0"></div>
+    <div class="sp-dot" id="sp1"></div>
+    <div class="sp-dot" id="sp2"></div>
+    <div class="sp-dot" id="sp3"></div>
+    <div class="sp-dot" id="sp4"></div>
+  </div>
+  <div id="briefing-content"></div>
+  <button class="btn-action" style="width:100%;margin-top:0.5rem" onclick="startStage('warmup')">READY FOR WARM-UP →</button>
+</div>
+
+<!-- ═══ WARMUP (TAP) STAGE ═══ -->
+<div id="screen-warmup" class="screen">
+  <div class="stage-header">
+    <button class="back-btn" onclick="showScreen('screen-map')">← MAP</button>
+    <div><div class="stage-title" id="warmup-mission-title">Mission 1</div><div class="stage-sub" id="warmup-sub">Stage 2 of 5 · Syllable Tap Warm-Up</div></div>
+  </div>
+  <div class="stage-progress">
+    <div class="sp-dot done" id="wsp0"></div>
+    <div class="sp-dot current" id="wsp1"></div>
+    <div class="sp-dot" id="wsp2"></div>
+    <div class="sp-dot" id="wsp3"></div>
+    <div class="sp-dot" id="wsp4"></div>
+  </div>
+  <div class="tap-progress"><span id="tap-prog-text">Word 1 of 6</span><span id="tap-score-text">0 correct</span></div>
+  <div class="tap-word-display">
+    <div class="tap-word" id="tap-word" onclick="animateTap()">—</div>
+    <div class="tap-count" id="tap-count">Tap to count syllables</div>
+    <div class="tap-hint" id="tap-hint">Then choose below</div>
+  </div>
+  <div class="tap-options" id="tap-options"></div>
+  <div class="tap-feedback tap-fb-neutral" id="tap-feedback">Tap the word, then choose the syllable count.</div>
+  <button class="next-btn" id="tap-next-btn" onclick="nextTapWord()" style="display:none">NEXT WORD →</button>
+</div>
+
+<!-- ═══ SORT STAGE ═══ -->
+<div id="screen-sort" class="screen">
+  <div class="stage-header">
+    <button class="back-btn" onclick="showScreen('screen-map')">← MAP</button>
+    <div><div class="stage-title" id="sort-mission-title">Mission 1</div><div class="stage-sub">Stage 3 of 5 · Word Sort</div></div>
+  </div>
+  <div class="stage-progress">
+    <div class="sp-dot done"></div><div class="sp-dot done"></div>
+    <div class="sp-dot current"></div><div class="sp-dot"></div><div class="sp-dot"></div>
+  </div>
+  <div class="sort-instructions"><strong>DRAG & DROP</strong> each word into the correct engine bay. Open Engine = long vowel, no doubling. Double Shield = Rabbit Rule triggered.</div>
+  <div class="sort-bank" id="sort-bank"></div>
+  <div class="sort-columns">
+    <div class="sort-col sort-col-open" id="sort-open" ondragover="onDragOver(event)" ondrop="onDrop(event,'open')" ondragleave="onDragLeave(event)">
+      <div class="sort-col-header">🔓 Open Engine<br><small style="font-size:0.6rem;font-family:Exo 2">long vowel · no double</small></div>
+      <div class="sort-col-body" id="sort-open-body"></div>
+    </div>
+    <div class="sort-col sort-col-double" id="sort-double" ondragover="onDragOver(event)" ondrop="onDrop(event,'double')" ondragleave="onDragLeave(event)">
+      <div class="sort-col-header">🛡️ Double Shield<br><small style="font-size:0.6rem;font-family:Exo 2">Rabbit Rule · doubled</small></div>
+      <div class="sort-col-body" id="sort-double-body"></div>
+    </div>
+  </div>
+  <div class="sort-result" id="sort-result" style="display:none"></div>
+  <button class="btn-action" id="sort-check-btn" style="width:100%" onclick="checkSort()">CHECK SORT →</button>
+</div>
+
+<!-- ═══ SPELLING CHALLENGE (vs ARIA-7) STAGE ═══ -->
+<div id="screen-spell" class="screen">
+  <div class="stage-header">
+    <button class="back-btn" onclick="showScreen('screen-map')">← MAP</button>
+    <div><div class="stage-title" id="spell-mission-title">Mission 1</div><div class="stage-sub">Stage 4 of 5 · Spelling Challenge vs ARIA-7</div></div>
+  </div>
+  <div class="stage-progress">
+    <div class="sp-dot done"></div><div class="sp-dot done"></div><div class="sp-dot done"></div>
+    <div class="sp-dot current"></div><div class="sp-dot"></div>
+  </div>
+  <div class="active-pilot-banner" id="spell-apb"></div>
+  <div class="scores" id="spell-scores">
+    <div class="score-tile mine">
+      <div class="s-name" id="spell-my-name">Me</div>
+      <div class="s-num" id="spell-my-score">0</div>
+      <div class="s-sub">pilot score</div>
+    </div>
+    <div class="score-tile p2" id="spell-p2-tile" style="display:none">
+      <div class="s-name" id="spell-p2-name">P2</div>
+      <div class="s-num" id="spell-p2-score">0</div>
+      <div class="s-sub">co-pilot</div>
+    </div>
+    <div class="score-tile aria" id="spell-aria-tile">
+      <div class="s-name">ARIA-7</div>
+      <div class="s-num" id="spell-aria-score">0</div>
+      <div class="s-sub">rival score</div>
+    </div>
+  </div>
+  <div class="trajectory">
+    <div class="traj-track"><div class="traj-fill" id="spell-traj-fill" style="width:0%"></div></div>
+    <div class="traj-labels"><span>Word 1</span><span id="spell-traj-end">Word 10 🌕</span></div>
+  </div>
+  <div class="aria-thinking" id="aria-thinking">
+    <span>🤖 ARIA-7 analyzing</span>
+    <div class="aria-dots"><span></span><span></span><span></span></div>
+  </div>
+  <div class="word-card">
+    <div>
+      <span class="orbit-label" id="spell-orbit-label">5.3</span>
+      <span class="reentry-badge" id="spell-reentry-badge" style="display:none">↩ Re-entry</span>
+    </div>
+    <div class="word-stem" id="spell-word-stem">—</div>
+    <div class="word-hint" id="spell-word-hint">Analyze the engine room</div>
+    <div class="orbit-hint" id="spell-orbit-hint">⚙️</div>
+  </div>
+  <div class="choices" id="spell-choices"></div>
+  <div class="feedback neutral" id="spell-feedback">Select the correctly spelled word</div>
+  <div id="repair-panel">
+    <div class="repair-card">
+      <div class="repair-title">⚠️ Engine Damage · Repair Required</div>
+      <div class="scoop-display" id="scoop-display"></div>
+      <div class="engine-rule" id="engine-rule"></div>
+      <label style="font-family:Orbitron,monospace;font-size:0.65rem;letter-spacing:0.15em;color:var(--muted);display:block;margin-bottom:0.5rem;">TYPE THE CORRECT SPELLING TO REPAIR</label>
+      <div class="repair-input-wrap">
+        <input class="repair-input" id="repair-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="type here…"/>
+      </div>
+      <div class="repair-hint" id="repair-hint">Type the word exactly as shown above</div>
+      <button class="btn-repair" id="btn-repair" onclick="submitRepair()">ENGAGE REPAIR SEQUENCE →</button>
+    </div>
+  </div>
+  <button class="next-btn" id="spell-next-btn" onclick="nextSpellWord()">NEXT WORD →</button>
+</div>
+
+<!-- ═══ READING COMP STAGE ═══ -->
+<div id="screen-reading" class="screen">
+  <div class="stage-header">
+    <button class="back-btn" onclick="showScreen('screen-map')">← MAP</button>
+    <div><div class="stage-title" id="read-mission-title">Mission 1</div><div class="stage-sub">Stage 5 of 5 · Reading Comprehension</div></div>
+  </div>
+  <div class="stage-progress">
+    <div class="sp-dot done"></div><div class="sp-dot done"></div><div class="sp-dot done"></div><div class="sp-dot done"></div>
+    <div class="sp-dot current"></div>
+  </div>
+  <div id="reading-content"></div>
+  <div id="comp-questions"></div>
+  <div class="feedback neutral" id="read-feedback" style="display:none"></div>
+  <button class="btn-action" id="read-finish-btn" style="width:100%;display:none" onclick="finishMission()">MISSION DEBRIEF →</button>
+</div>
+
+<!-- ═══ DEBRIEF ═══ -->
+<div id="screen-debrief" class="screen">
+  <div class="debrief-card" id="debrief-content"></div>
+  <button class="btn-csv" onclick="downloadCSV()">📊 Download Pilot Log CSV</button>
+  <button class="btn-next-mission" id="btn-next-mission" onclick="goNextMission()">NEXT MISSION →</button>
+  <button class="btn-back-map" onclick="showScreen('screen-map')">← RETURN TO CAMPAIGN MAP</button>
+</div>
+
+<!-- ═══ PILOT LOG ═══ -->
+<div id="screen-log" class="screen">
+  <div class="stage-header">
+    <button class="back-btn" onclick="showScreen('screen-map')">← MAP</button>
+    <div><div class="stage-title">Pilot Log</div><div class="stage-sub">Your mission history</div></div>
+  </div>
+  <div class="log-card" id="log-content"></div>
+  <button class="btn-csv" onclick="downloadCSV()">📊 Download Progress CSV</button>
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+/* ================================================================
+   MISSION: NEBULA-Y — SOLO CAMPAIGN ENGINE
+   ================================================================ */
+
+// ── STARS ──
+const starsEl=document.getElementById('stars');
+for(let i=0;i<120;i++){const s=document.createElement('div');s.className='star';const sz=Math.random()*2+0.5;s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--dur:${2+Math.random()*4}s;--delay:${Math.random()*5}s;opacity:${0.2+Math.random()*0.5}`;starsEl.appendChild(s);}
+
+// ── GAME STATE ──
+let G = {
+  // P1
+  playerName: 'Pilot', token: '🚀',
+  // P2
+  p2Name: 'Co-Pilot', p2Token: '📡',
+  // mode: 'solo' | 'local' | 'device'
+  mode: 'solo',
+  ariaOn: true,
+  sessionCode: '',
+  currentMission: 0,
+  completedMissions: [],
+  missionScores: [],
+  campaignPilotPts: 0, campaignAriaPts: 0,
+  // multiplayer turn tracking
+  activePlayer: 1, // 1 or 2
+  // per-mission session
+  spellDeck: [],
+  spellIdx: 0,
+  spellMyScore: 0,
+  spellP2Score: 0,
+  spellAriaScore: 0,
+  spellAnswered: false,
+  repairTarget: '',
+  tapWords: [],
+  tapIdx: 0,
+  tapCorrect: 0,
+  tapP2Correct: 0,
+  tapTapCount: 0,
+  tapAnswered: false,
+  tapPhase: 1, // 1=p1 round, 2=p2 round
+  sortWords: [],
+  readQs: [],
+  readIdx: 0,
+  readCorrect: 0,
+  readP2Correct: 0,
+  readAnswered: false,
+};
+
+// ── MISSION DEFINITIONS ──
+const MISSIONS = [
+  {
+    id: 1,
+    title: 'Orbit 5.3 — The /ē/ Discovery',
+    sub: 'Open Engine vs. Double Shield · y = /ē/ at word end',
+    badge: '🌕',
+    badgeTitle: 'y-Moon Navigator',
+    step: '5.3',
+    color: 'var(--green)',
+    orbitClass: 'orbit-53',
+    orbitLabel: '5.3 · /ē/ Orbit',
+    locked: false,
+  },
+  {
+    id: 2,
+    title: 'Orbit 5.3 — Double Shield Training',
+    sub: 'Rabbit Rule mastery · VCCV doubling · -y endings',
+    badge: '🛡️',
+    badgeTitle: 'Rabbit Rule Pilot',
+    step: '5.3',
+    color: 'var(--amber)',
+    orbitClass: 'orbit-53',
+    orbitLabel: '5.3 · Double Shield',
+    locked: true,
+  },
+  {
+    id: 3,
+    title: 'Orbit 5.4 — Advanced Launch',
+    sub: '-ey vs. -y · advanced doubling patterns',
+    badge: '🚀',
+    badgeTitle: 'Advanced Pilot',
+    step: '5.4',
+    color: 'var(--amber)',
+    orbitClass: 'orbit-54',
+    orbitLabel: '5.4 · Advanced',
+    locked: true,
+  },
+  {
+    id: 4,
+    title: 'Orbit 5.4 — Nebula-Y Deep Dive',
+    sub: 'Open VCV syllables · long vowel patterns',
+    badge: '🛸',
+    badgeTitle: 'Deep Space Pilot',
+    step: '5.4',
+    color: 'var(--amber)',
+    orbitClass: 'orbit-54',
+    orbitLabel: '5.4 · VCV Deep',
+    locked: true,
+  },
+  {
+    id: 5,
+    title: 'Orbit 5.5 — Final Frontier',
+    sub: 'Open VCV mastery · rr doubling · mixed challenge',
+    badge: '⭐',
+    badgeTitle: 'Nebula-Y Champion',
+    step: '5.5',
+    color: 'var(--purple)',
+    orbitClass: 'orbit-55',
+    orbitLabel: '5.5 · Final Orbit',
+    locked: true,
+  },
+];
+
+// ── WORD DATA ──
+// Each word: {word, choices, step, rule:'open'|'double', syllables:[{text,type,vowelMark,ySound?}], feedback, sortType:'open'|'double'}
+const WORD_DB = {
+  '5.3-open': [
+    {word:'baby',  choices:['baby','babey','babie','babbey'], rule:'open', syllables:[{text:'ba',type:'open',vowelMark:'ā'},{text:'by',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Open Engine — "ba-" ends in vowel → long /ā/ · y = long /ē/ at word end'},
+    {word:'pony',  choices:['pony','poney','ponie','ponney'], rule:'open', syllables:[{text:'po',type:'open',vowelMark:'ō'},{text:'ny',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Open Engine — "po-" ends in vowel → long /ō/ · y = long /ē/'},
+    {word:'lady',  choices:['lady','ladey','ladie','laddey'], rule:'open', syllables:[{text:'la',type:'open',vowelMark:'ā'},{text:'dy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Open Engine — "la-" ends in vowel → long /ā/ · y = long /ē/'},
+    {word:'tiny',  choices:['tiny','tiney','tinie','tinnney'], rule:'open', syllables:[{text:'ti',type:'open',vowelMark:'ī'},{text:'ny',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Open Engine — "ti-" ends in vowel → long /ī/ · y = long /ē/'},
+    {word:'cozy',  choices:['cozy','cozey','cozie','cozzey'], rule:'open', syllables:[{text:'co',type:'open',vowelMark:'ō'},{text:'zy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Open Engine — "co-" ends in vowel → long /ō/ · cozy'},
+    {word:'lazy',  choices:['lazy','lazey','lazie','lazzey'], rule:'open', syllables:[{text:'la',type:'open',vowelMark:'ā'},{text:'zy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Open Engine — "la-" ends in vowel → long /ā/ · lazy'},
+    {word:'navy',  choices:['navy','navey','navie','nabbey'], rule:'open', syllables:[{text:'na',type:'open',vowelMark:'ā'},{text:'vy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Open Engine — "na-" ends in vowel → long /ā/ · navy'},
+    {word:'gravy', choices:['gravy','gravey','gravie','grabbey'], rule:'open', syllables:[{text:'gra',type:'open',vowelMark:'ā'},{text:'vy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Open Engine — "gra-" ends in vowel → long /ā/ · gravy'},
+  ],
+  '5.3-double': [
+    {word:'penny',  choices:['penny','peney','penie','pennney'], rule:'double', syllables:[{text:'pen',type:'closed',vowelMark:'ĕ'},{text:'ny',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ĕ/ + single consonant → Rabbit Rule doubles "n"'},
+    {word:'silly',  choices:['silly','siley','silie','silley'], rule:'double', syllables:[{text:'sil',type:'closed',vowelMark:'ĭ'},{text:'ly',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ĭ/ + single consonant → Rabbit Rule doubles "l"'},
+    {word:'puppy',  choices:['puppy','pupey','pupie','puppey'], rule:'double', syllables:[{text:'pup',type:'closed',vowelMark:'ŭ'},{text:'py',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ŭ/ + single consonant → Rabbit Rule doubles "p"'},
+    {word:'happy',  choices:['happy','hapey','hapie','happey'], rule:'double', syllables:[{text:'hap',type:'closed',vowelMark:'ă'},{text:'py',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ă/ + single consonant → Rabbit Rule doubles "p"'},
+    {word:'funny',  choices:['funny','funey','funie','funnney'], rule:'double', syllables:[{text:'fun',type:'closed',vowelMark:'ŭ'},{text:'ny',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ŭ/ + single consonant → Rabbit Rule doubles "n"'},
+    {word:'jelly',  choices:['jelly','jeley','jelie','jelley'], rule:'double', syllables:[{text:'jel',type:'closed',vowelMark:'ĕ'},{text:'ly',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ĕ/ + single consonant → Rabbit Rule doubles "l"'},
+    {word:'bunny',  choices:['bunny','buney','bunie','bunnney'], rule:'double', syllables:[{text:'bun',type:'closed',vowelMark:'ŭ'},{text:'ny',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ŭ/ + single consonant → Rabbit Rule doubles "n"'},
+    {word:'kitty',  choices:['kitty','kitey','kittey','kity'], rule:'double', syllables:[{text:'kit',type:'closed',vowelMark:'ĭ'},{text:'ty',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ĭ/ + single consonant → Rabbit Rule doubles "t"'},
+    {word:'muddy',  choices:['muddy','mudey','mudie','muddey'], rule:'double', syllables:[{text:'mud',type:'closed',vowelMark:'ŭ'},{text:'dy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ŭ/ + single consonant → Rabbit Rule doubles "d"'},
+    {word:'nutty',  choices:['nutty','nutey','nuttey','nuty'], rule:'double', syllables:[{text:'nut',type:'closed',vowelMark:'ŭ'},{text:'ty',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ŭ/ + single consonant → Rabbit Rule doubles "t"'},
+    {word:'foggy',  choices:['foggy','fogey','fogie','foggey'], rule:'double', syllables:[{text:'fog',type:'closed',vowelMark:'ŏ'},{text:'gy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ŏ/ + single consonant → Rabbit Rule doubles "g"'},
+    {word:'dizzy',  choices:['dizzy','dizey','dizie','dizzey'], rule:'double', syllables:[{text:'diz',type:'closed',vowelMark:'ĭ'},{text:'zy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ĭ/ + single consonant → Rabbit Rule doubles "z"'},
+  ],
+  '5.4-mixed': [
+    {word:'monkey', choices:['monkey','monky','monkie','munkee'], rule:'open', syllables:[{text:'mon',type:'closed',vowelMark:'ŏ'},{text:'key',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Exception: "monkey" uses -ey (not -y) · high-frequency word'},
+    {word:'turkey', choices:['turkey','turky','turkie','turkee'], rule:'open', syllables:[{text:'tur',type:'closed',vowelMark:'ŭ'},{text:'key',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Exception: "turkey" uses -ey · high-frequency word — memorize this ending'},
+    {word:'valley', choices:['valley','vally','valie','vallee'], rule:'open', syllables:[{text:'val',type:'closed',vowelMark:'ă'},{text:'ley',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'"valley" uses -ey (not -ley) · high-frequency -ey word'},
+    {word:'honey',  choices:['honey','hunney','hony','honney'], rule:'open', syllables:[{text:'hon',type:'closed',vowelMark:'ŭ'},{text:'ey',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'"honey" uses -ey · the vowel spelling is different from the sound pattern'},
+    {word:'money',  choices:['money','munney','mony','monney'], rule:'open', syllables:[{text:'mon',type:'closed',vowelMark:'ŭ'},{text:'ey',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'"money" uses -ey · high-frequency — must memorize'},
+    {word:'dizzy',  choices:['dizzy','dizey','dizie','dizzey'], rule:'double', syllables:[{text:'diz',type:'closed',vowelMark:'ĭ'},{text:'zy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ĭ/ → Rabbit Rule doubles "z" · use -y not -ey'},
+    {word:'foggy',  choices:['foggy','fogey','fogie','foggey'], rule:'double', syllables:[{text:'fog',type:'closed',vowelMark:'ŏ'},{text:'gy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ŏ/ → Rabbit Rule doubles "g" · use -y not -ey'},
+    {word:'rocky',  choices:['rocky','rockey','roky','rokkee'], rule:'double', syllables:[{text:'rock',type:'closed',vowelMark:'ŏ'},{text:'y',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — "rock" is already closed with "ck" · add -y only'},
+    {word:'lucky',  choices:['lucky','luckey','luky','lukkee'], rule:'double', syllables:[{text:'luck',type:'closed',vowelMark:'ŭ'},{text:'y',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'"luck" already ends in "ck" · no doubling needed · add -y only'},
+    {word:'sticky', choices:['sticky','stickey','stiky','stikkee'], rule:'double', syllables:[{text:'stick',type:'closed',vowelMark:'ĭ'},{text:'y',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'"stick" ends in "ck" · already closed · add -y only'},
+  ],
+  '5.4-adv': [
+    {word:'candy',  choices:['candy','candey','candie','canndy'], rule:'double', syllables:[{text:'can',type:'closed',vowelMark:'ă'},{text:'dy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Closed first syllable — consonant cluster "nd" — y = long /ē/'},
+    {word:'empty',  choices:['empty','emptey','emptie','emppty'], rule:'double', syllables:[{text:'emp',type:'closed',vowelMark:'ĕ'},{text:'ty',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Closed first syllable — consonant cluster "mp" — y = long /ē/'},
+    {word:'fancy',  choices:['fancy','fancey','fancie','fansy'], rule:'double', syllables:[{text:'fan',type:'closed',vowelMark:'ă'},{text:'cy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Closed first syllable — consonant cluster "nc" — y = long /ē/'},
+    {word:'handy',  choices:['handy','handey','handie','hanndey'], rule:'double', syllables:[{text:'han',type:'closed',vowelMark:'ă'},{text:'dy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Closed first syllable — consonant cluster "nd" — y = long /ē/'},
+    {word:'windy',  choices:['windy','windey','windie','winndy'], rule:'double', syllables:[{text:'win',type:'closed',vowelMark:'ĭ'},{text:'dy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Closed first syllable — consonant cluster "nd" — y = long /ē/'},
+    {word:'bumpy',  choices:['bumpy','bumpey','bumpie','bummpy'], rule:'double', syllables:[{text:'bump',type:'closed',vowelMark:'ŭ'},{text:'y',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Closed first syllable — consonant cluster "mp" — y = long /ē/'},
+    {word:'dusty',  choices:['dusty','dustey','dustie','dussty'], rule:'double', syllables:[{text:'dust',type:'closed',vowelMark:'ŭ'},{text:'y',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Closed first syllable — consonant cluster "st" — y = long /ē/'},
+    {word:'rusty',  choices:['rusty','rustey','rustie','russty'], rule:'double', syllables:[{text:'rust',type:'closed',vowelMark:'ŭ'},{text:'y',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Closed first syllable — consonant cluster "st" — y = long /ē/'},
+  ],
+  '5.5-mixed': [
+    {word:'worry',  choices:['worry','worrey','wory','worrrey'], rule:'double', syllables:[{text:'wor',type:'closed',vowelMark:'ŭ'},{text:'ry',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ŭ/ + r → Rabbit Rule doubles "r"'},
+    {word:'hurry',  choices:['hurry','hurrey','hury','hurrrey'], rule:'double', syllables:[{text:'hur',type:'closed',vowelMark:'ŭ'},{text:'ry',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ŭ/ + r → Rabbit Rule doubles "r"'},
+    {word:'carry',  choices:['carry','carey','cary','carrey'], rule:'double', syllables:[{text:'car',type:'closed',vowelMark:'ă'},{text:'ry',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ă/ + r → Rabbit Rule doubles "r"'},
+    {word:'sorry',  choices:['sorry','sorey','sory','sorrey'], rule:'double', syllables:[{text:'sor',type:'closed',vowelMark:'ŏ'},{text:'ry',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ŏ/ + r → Rabbit Rule doubles "r"'},
+    {word:'merry',  choices:['merry','merey','mery','merrey'], rule:'double', syllables:[{text:'mer',type:'closed',vowelMark:'ĕ'},{text:'ry',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ĕ/ + r → Rabbit Rule doubles "r"'},
+    {word:'berry',  choices:['berry','berey','bery','berrey'], rule:'double', syllables:[{text:'ber',type:'closed',vowelMark:'ĕ'},{text:'ry',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ĕ/ + r → Rabbit Rule doubles "r"'},
+    {word:'ferry',  choices:['ferry','ferey','fery','ferrey'], rule:'double', syllables:[{text:'fer',type:'closed',vowelMark:'ĕ'},{text:'ry',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ĕ/ + r → Rabbit Rule doubles "r"'},
+    {word:'foggy',  choices:['foggy','fogey','fogie','foggey'], rule:'double', syllables:[{text:'fog',type:'closed',vowelMark:'ŏ'},{text:'gy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ŏ/ → Rabbit Rule doubles "g"'},
+    {word:'lucky',  choices:['lucky','luckey','luky','lukkee'], rule:'double', syllables:[{text:'luck',type:'closed',vowelMark:'ŭ'},{text:'y',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'"luck" ends in "ck" · already closed · add -y only'},
+    {word:'honey',  choices:['honey','hunney','hony','honney'], rule:'open', syllables:[{text:'hon',type:'closed',vowelMark:'ŭ'},{text:'ey',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'"honey" uses -ey — high-frequency exception · memorize'},
+  ],
+};
+
+// ── BRIEFING CONTENT ──
+const BRIEFINGS = [
+  // Mission 1: 5.3 Intro
+  `<div class="briefing-card">
+    <div class="briefing-badge bb-cyan">🛸 Mission 1 Briefing · Step 5.3</div>
+    <h3>The /ē/ Discovery</h3>
+    <p>Welcome, pilot. In the Nebula-Y sector, every word ending in the letter <strong>y</strong> carries a secret vowel sound. Your mission: decode the engine room of each word.</p>
+    <div class="concept-box">
+      <div class="cb-title">Rule 1 · Open Engine 🔓</div>
+      <p style="font-size:0.83rem;color:var(--muted);line-height:1.6">When the first syllable ends in a vowel, the engine is <em>open</em>. The vowel sound is <strong>long</strong>. No doubling needed.</p>
+      <div class="examples"><span class="word-pill wp-open">ba·by</span><span class="word-pill wp-open">po·ny</span><span class="word-pill wp-open">la·dy</span><span class="word-pill wp-open">ti·ny</span></div>
+    </div>
+    <div class="concept-box">
+      <div class="cb-title">Rule 2 · Double Shield 🛡️ (Rabbit Rule)</div>
+      <p style="font-size:0.83rem;color:var(--muted);line-height:1.6">When a short vowel is followed by a <strong>single consonant</strong>, the Rabbit Rule fires: double that consonant to shield the short vowel. Then add <strong>-y</strong> (not -ey!).</p>
+      <div class="examples"><span class="word-pill wp-double">pen·ny</span><span class="word-pill wp-double">pup·py</span><span class="word-pill wp-double">sil·ly</span><span class="word-pill wp-double">fun·ny</span></div>
+    </div>
+    <p>⚠️ <strong>ARIA-7 Error:</strong> ARIA-7 always tries to trick you with <em>-ey</em> endings. Remember: regular multi-syllable words ending in the /ē/ sound use <strong>-y</strong>, not -ey!</p>
+  </div>`,
+  // Mission 2: 5.3 Double Shield focus
+  `<div class="briefing-card">
+    <div class="briefing-badge bb-amber">🛡️ Mission 2 Briefing · Step 5.3</div>
+    <h3>Double Shield Deep Training</h3>
+    <p>Good work, pilot. Today we go deeper into the <strong>Rabbit Rule</strong>. ARIA-7 has upgraded its -ey attack. You must master the doubling pattern cold.</p>
+    <div class="concept-box">
+      <div class="cb-title">The Rabbit Rule — Step by Step</div>
+      <p style="font-size:0.83rem;color:var(--muted);line-height:1.6">1. Say the first syllable. Is the vowel <strong>short</strong>?<br>2. Is there only <strong>one consonant</strong> after it?<br>3. If YES to both → <strong>Double</strong> the consonant.<br>4. Add <strong>-y</strong> (never -ey) for the /ē/ sound.</p>
+      <div class="examples"><span class="word-pill wp-double">kit·ty</span><span class="word-pill wp-double">mud·dy</span><span class="word-pill wp-double">fog·gy</span><span class="word-pill wp-double">diz·zy</span></div>
+    </div>
+    <div class="concept-box">
+      <div class="cb-title">When NOT to double</div>
+      <p style="font-size:0.83rem;color:var(--muted);line-height:1.6">If the first syllable is <strong>open</strong> (ends in a vowel) → no doubling. Long vowel stays long.</p>
+      <div class="examples"><span class="word-pill wp-open">la·zy</span><span class="word-pill wp-open">co·zy</span><span class="word-pill wp-open">na·vy</span><span class="word-pill wp-open">gra·vy</span></div>
+    </div>
+  </div>`,
+  // Mission 3: 5.4 -ey vs -y
+  `<div class="briefing-card">
+    <div class="briefing-badge bb-amber">🚀 Mission 3 Briefing · Step 5.4</div>
+    <h3>-ey vs. -y: ARIA-7's Favorite Trap</h3>
+    <p>Step 5.4 is where ARIA-7 loves to strike. Some words use <strong>-ey</strong> at the end — but most use <strong>-y</strong>. Here's how to tell the difference.</p>
+    <div class="concept-box">
+      <div class="cb-title">-ey endings (high-frequency exceptions)</div>
+      <p style="font-size:0.83rem;color:var(--muted);line-height:1.6">A small set of common words use -ey. You must memorize these!</p>
+      <div class="examples"><span class="word-pill wp-open">monkey</span><span class="word-pill wp-open">turkey</span><span class="word-pill wp-open">valley</span><span class="word-pill wp-open">honey</span><span class="word-pill wp-open">money</span></div>
+    </div>
+    <div class="concept-box">
+      <div class="cb-title">-y endings (the rule)</div>
+      <p style="font-size:0.83rem;color:var(--muted);line-height:1.6">If the Double Shield or Open Engine rule applies → always use <strong>-y</strong>, not -ey. The Rabbit Rule words especially love to trick you!</p>
+      <div class="examples"><span class="word-pill wp-double">rocky</span><span class="word-pill wp-double">lucky</span><span class="word-pill wp-double">sticky</span><span class="word-pill wp-double">foggy</span></div>
+    </div>
+    <p>🎯 Key: After "ck" endings, just add <strong>-y</strong> — no doubling needed because "ck" already closes the syllable.</p>
+  </div>`,
+  // Mission 4: 5.4 Consonant clusters
+  `<div class="briefing-card">
+    <div class="briefing-badge bb-amber">🛸 Mission 4 Briefing · Step 5.4</div>
+    <h3>Consonant Clusters &amp; -y</h3>
+    <p>Advanced pilot territory. When a first syllable ends in a <strong>consonant cluster</strong> (two consonants together), the syllable is already closed — no doubling.</p>
+    <div class="concept-box">
+      <div class="cb-title">Consonant cluster = already closed</div>
+      <p style="font-size:0.83rem;color:var(--muted);line-height:1.6">Clusters like "nd", "mp", "st", "nc" already do the job. Just add <strong>-y</strong>.</p>
+      <div class="examples"><span class="word-pill wp-double">can·dy</span><span class="word-pill wp-double">emp·ty</span><span class="word-pill wp-double">fan·cy</span><span class="word-pill wp-double">win·dy</span><span class="word-pill wp-double">bump·y</span></div>
+    </div>
+    <div class="concept-box">
+      <div class="cb-title">Single consonant = Rabbit Rule fires</div>
+      <p style="font-size:0.83rem;color:var(--muted);line-height:1.6">If only ONE consonant separates the short vowel from -y, you must double.</p>
+      <div class="examples"><span class="word-pill wp-double">fog·gy</span><span class="word-pill wp-double">mud·dy</span><span class="word-pill wp-double">kit·ty</span></div>
+    </div>
+  </div>`,
+  // Mission 5: 5.5 Final
+  `<div class="briefing-card">
+    <div class="briefing-badge bb-purple">⭐ Mission 5 Briefing · Step 5.5</div>
+    <h3>Final Frontier — Mixed Mastery</h3>
+    <p>This is your graduation flight, pilot. ARIA-7 will throw every pattern at you. You'll face rr-doubling, -ey exceptions, -ck+y words, and Open Engine all in one mission.</p>
+    <div class="concept-box">
+      <div class="cb-title">The rr Pattern</div>
+      <p style="font-size:0.83rem;color:var(--muted);line-height:1.6">Words like <strong>worry</strong>, <strong>hurry</strong>, <strong>carry</strong> all follow the Rabbit Rule with 'r'. Short vowel + single r = double the r.</p>
+      <div class="examples"><span class="word-pill wp-double">wor·ry</span><span class="word-pill wp-double">hur·ry</span><span class="word-pill wp-double">car·ry</span><span class="word-pill wp-double">sor·ry</span><span class="word-pill wp-double">mer·ry</span></div>
+    </div>
+    <div class="concept-box">
+      <div class="cb-title">Full Pattern Review</div>
+      <p style="font-size:0.83rem;color:var(--muted);line-height:1.6">Open Engine → <span style="color:var(--cyan)">-y, no double</span><br>Single consonant → <span style="color:var(--amber)">Rabbit Rule, double + -y</span><br>Consonant cluster → <span style="color:var(--amber)">-y, no extra double</span><br>Exceptions (honey, money…) → <span style="color:var(--purple)">-ey, memorize</span></p>
+    </div>
+    <p>🏆 Defeat ARIA-7 and claim the <strong>Nebula-Y Champion</strong> badge!</p>
+  </div>`,
+];
+
+// ── READING PASSAGES & QUESTIONS ──
+const READINGS = [
+  // Mission 1
+  {
+    title: 'The Pony and the Baby Fox',
+    text: `A <span class="highlight">pony</span> lived on a cozy farm. One day, a tiny fox came to visit. The fox was funny and silly. The pony let the baby fox rest by the gate. "This is a happy place," said the pony. The lazy sun set slowly. The <span class="highlight">tiny</span> fox ran home to its family, feeling very lucky.`,
+    questions: [
+      {q:'What animal came to visit the pony?', options:['A puppy','A tiny fox','A bunny','A baby robin'], answer:1},
+      {q:'Which word from the story ends with the Double Shield (Rabbit Rule) pattern?', options:['pony','lazy','funny','tiny'], answer:2},
+      {q:'Where did the tiny fox rest?', options:['In the barn','By the gate','In the hay','Under a tree'], answer:1},
+    ]
+  },
+  // Mission 2
+  {
+    title: 'The Muddy Puppy',
+    text: `The <span class="highlight">puppy</span> was very muddy after the rain. The kitty watched from the porch, looking silly. "You are <span class="highlight">silly</span>," said the kitty. The puppy just wagged its tail, happy and nutty. Mom got a tub of soapy water. The puppy became less muddy. Then it ran back to play in the foggy yard again.`,
+    questions: [
+      {q:'What made the puppy muddy?', options:['Playing in dirt','The rain','A muddy pond','Digging holes'], answer:1},
+      {q:'Which word from the story shows the Rabbit Rule with double "pp"?', options:['muddy','kitty','puppy','foggy'], answer:2},
+      {q:'What did the kitty say to the puppy?', options:['"You are messy"','"You are silly"','"You need a bath"','"Stop running!"'], answer:1},
+    ]
+  },
+  // Mission 3
+  {
+    title: 'A Trip to the Valley',
+    text: `In the <span class="highlight">valley</span>, there was a rocky path and a honey stand. A monkey swung from the trees, eating something sticky. "<span class="highlight">Lucky</span> monkey!" said Sam. The turkey in the field gobbled. Sam bought honey and walked back up the dusty trail. The windy sky made the trees sway. What a fancy day!`,
+    questions: [
+      {q:'Which word in the story uses the -ey ending?', options:['lucky','rocky','windy','honey'], answer:3},
+      {q:'What was the monkey eating?', options:['Something sticky','A pony tail','Some candy','Dusty nuts'], answer:0},
+      {q:'What did Sam buy at the stand?', options:['Turkey','Rocky candy','Honey','Fancy nuts'], answer:2},
+    ]
+  },
+  // Mission 4
+  {
+    title: 'The Handy Inventor',
+    text: `Benny had a handy plan. He wanted to build a fancy rocket from empty cans and dusty wires. It was windy outside, but Benny felt bumpy with excitement. "This candy-colored rocket will fly to the Nebula-Y zone," he said. It was a tricky job, but Benny was not the type to feel empty inside.`,
+    questions: [
+      {q:'What did Benny want to build?', options:['A fancy car','A handy rocket','A bumpy sled','A windy kite'], answer:1},
+      {q:'Which word from the story uses a consonant cluster before -y?', options:['Benny','rocky','dusty','tricky'], answer:2},
+      {q:'How did Benny feel about the project?', options:['Empty inside','Sleepy','Bumpy with excitement','Rusty'], answer:2},
+    ]
+  },
+  // Mission 5
+  {
+    title: 'Hurry, Berry, Sorry!',
+    text: `"<span class="highlight">Hurry</span>!" said Carrie. She had to carry the sorry-looking berry basket to the merry fair. The cherry stand was a ferry ride away. She was in a hurry, so she ran. The foggy morning made the path slippery. But Carrie was lucky: the ferry was running late too. She made it just in time, and everyone was merry.`,
+    questions: [
+      {q:'What was Carrie carrying?', options:['A merry basket','A cherry ferry','A sorry-looking berry basket','A foggy lantern'], answer:2},
+      {q:'Which pattern do "hurry," "carry," and "sorry" all share?', options:['Open Engine with -y','Rabbit Rule — double rr','Consonant cluster','Exception -ey'], answer:1},
+      {q:'Why was Carrie lucky?', options:['She found the berries','The ferry was running late','She won the fair','The fog lifted'], answer:1},
+    ]
+  },
+];
+
+// ── TAP WARM-UP WORDS (per mission) ──
+const TAP_WORDS = [
+  [{word:'baby',count:2},{word:'penny',count:2},{word:'fly',count:1},{word:'tiny',count:2},{word:'funny',count:2},{word:'lazy',count:2}],
+  [{word:'silly',count:2},{word:'puppy',count:2},{word:'muddy',count:2},{word:'pony',count:2},{word:'kitty',count:2},{word:'foggy',count:2}],
+  [{word:'monkey',count:2},{word:'turkey',count:2},{word:'rocky',count:2},{word:'lucky',count:2},{word:'valley',count:2},{word:'honey',count:2}],
+  [{word:'candy',count:2},{word:'empty',count:2},{word:'windy',count:2},{word:'fancy',count:2},{word:'bumpy',count:2},{word:'dusty',count:2}],
+  [{word:'hurry',count:2},{word:'carry',count:2},{word:'sorry',count:2},{word:'merry',count:2},{word:'berry',count:2},{word:'ferry',count:2}],
+];
+
+// ── SORT WORDS (per mission) ──
+const SORT_SETS = [
+  [{word:'baby',type:'open'},{word:'penny',type:'double'},{word:'pony',type:'open'},{word:'funny',type:'double'},{word:'tiny',type:'open'},{word:'puppy',type:'double'}],
+  [{word:'lazy',type:'open'},{word:'jelly',type:'double'},{word:'cozy',type:'open'},{word:'muddy',type:'double'},{word:'gravy',type:'open'},{word:'kitty',type:'double'}],
+  [{word:'monkey',type:'open'},{word:'rocky',type:'double'},{word:'valley',type:'open'},{word:'lucky',type:'double'},{word:'honey',type:'open'},{word:'foggy',type:'double'}],
+  [{word:'candy',type:'double'},{word:'baby',type:'open'},{word:'empty',type:'double'},{word:'navy',type:'open'},{word:'dusty',type:'double'},{word:'gravy',type:'open'}],
+  [{word:'hurry',type:'double'},{word:'honey',type:'open'},{word:'sorry',type:'double'},{word:'pony',type:'open'},{word:'merry',type:'double'},{word:'turkey',type:'open'}],
+];
+
+// ── SPELL DECKS (per mission, 10 words) ──
+const SPELL_DECKS = [
+  // M1: 5.3 intro — mix open and double
+  ['baby','pony','penny','puppy','tiny','funny','lady','jelly','cozy','silly'],
+  // M2: 5.3 double focus
+  ['kitty','muddy','nutty','foggy','dizzy','bunny','happy','muddy','funny','penny'],
+  // M3: 5.4 -ey vs -y
+  ['monkey','turkey','rocky','lucky','valley','sticky','honey','money','foggy','dizzy'],
+  // M4: 5.4 clusters
+  ['candy','empty','fancy','handy','windy','bumpy','dusty','rusty','rocky','lucky'],
+  // M5: 5.5 final
+  ['worry','hurry','carry','sorry','merry','berry','ferry','honey','lucky','foggy'],
+];
+
+// Build spell word objects from deck list
+function buildSpellDeck(missionIdx) {
+  const wordList = SPELL_DECKS[missionIdx];
+  const all = Object.values(WORD_DB).flat();
+  const result = [];
+  for (const wName of wordList) {
+    const found = all.find(w => w.word === wName);
+    if (found) result.push({...found});
+  }
+  return result;
+}
+
+// ── ARIA-7 LOGIC ──
+// ARIA-7 accuracy per mission (gets harder)
+const ARIA_ACCURACY = [0.55, 0.65, 0.70, 0.75, 0.80];
+const ARIA_TAUNTS = [
+  "ARIA-7 is watching your every move, pilot.",
+  "Impressive start. But I've upgraded my -ey subroutines.",
+  "Step 5.4 is MY territory. Bring it.",
+  "You're getting closer, but my Rabbit Rule algorithms are flawless.",
+  "Final orbit. One of us is landing on the y Moon. It will be me.",
+];
+
+function ariaAnswers(mIdx) {
+  // ARIA-7 scores based on how many words it "gets right"
+  const total = SPELL_DECKS[mIdx].length;
+  const acc = ARIA_ACCURACY[mIdx];
+  return Math.round(total * acc);
+}
+
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+
+// ── SETUP FUNCTIONS ──
+function selectMode(tab){
+  document.querySelectorAll('.mode-tab').forEach(t=>t.classList.remove('selected'));
+  tab.classList.add('selected');
+  const mode = tab.dataset.mode;
+  G.mode = mode;
+  const is2P = (mode==='local'||mode==='device');
+  document.getElementById('p2-panel').classList.toggle('show', is2P);
+  document.getElementById('aria-toggle-wrap').style.display = is2P ? 'flex' : 'none';
+  document.getElementById('session-panel').classList.toggle('show', mode==='device');
+  if(mode==='device' && !G.sessionCode) genSessionCode();
+  const labels = {solo:'🚀 Launch Solo Campaign', local:'🚀 Launch Pass & Play', device:'🚀 Launch 2-Device Game'};
+  document.getElementById('btn-launch').textContent = labels[mode];
+}
+function selectToken(player, btn){
+  const container = player===1 ? document.getElementById('p1-tokens') : document.getElementById('p2-tokens');
+  container.querySelectorAll('.token-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  if(player===1) G.token = btn.dataset.token;
+  else G.p2Token = btn.dataset.token;
+}
+function toggleAria(){
+  const cb = document.getElementById('aria-on-check');
+  G.ariaOn = cb.checked;
+}
+function genSessionCode(){
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  G.sessionCode = Array.from({length:6},()=>chars[Math.floor(Math.random()*chars.length)]).join('');
+  document.getElementById('session-code-display').textContent = G.sessionCode;
+}
+
+// ── HANDOFF OVERLAY ──
+let _handoffCb = null;
+function showHandoff(toPlayer, cb){
+  _handoffCb = cb;
+  const name = toPlayer===1 ? G.playerName : G.p2Name;
+  const tok  = toPlayer===1 ? G.token : G.p2Token;
+  const isP2 = toPlayer===2;
+  document.getElementById('handoff-icon').textContent = tok;
+  document.getElementById('handoff-title').textContent = `📲 Pass to ${name}`;
+  document.getElementById('handoff-sub').innerHTML = `<span class="${isP2?'handoff-p2':''}">${tok} ${name}</span>, it's your turn!<br>Hand the device over, then tap Ready.`;
+  document.getElementById('handoff-overlay').classList.add('show');
+}
+function dismissHandoff(){
+  document.getElementById('handoff-overlay').classList.remove('show');
+  if(_handoffCb){ const f=_handoffCb; _handoffCb=null; f(); }
+}
+
+// ── ACTIVE PILOT BANNER ──
+function setActivePilotBanner(elId){
+  const el = document.getElementById(elId);
+  if(!el) return;
+  if(G.mode!=='local'){ el.className='active-pilot-banner'; el.style.display='none'; return; }
+  const name = G.activePlayer===1 ? `${G.token} ${G.playerName}'s turn` : `${G.p2Token} ${G.p2Name}'s turn`;
+  el.textContent = name;
+  el.className = 'active-pilot-banner ' + (G.activePlayer===1?'apb-p1':'apb-p2');
+}
+
+// ── CAMPAIGN START ──
+function buildScoopDisplay(syllables){
+  if(!syllables||!syllables.length) return '';
+  return syllables.map((s,i)=>{
+    const isOpen=s.type==='open';
+    const color=isOpen?'#00e5ff':'#ffb300';
+    const w=Math.max(48,s.text.length*22);
+    const yBadge=s.ySound?`<span style="color:var(--green);font-size:0.7rem">${s.ySound}</span>`:'';
+    const scoop=`<svg viewBox="0 0 ${w} 18" width="${w}" height="18"><path d="M4,2 Q${w/2},16 ${w-4},2" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round"/></svg>`;
+    const divider=i<syllables.length-1?`<div class="syl-divider">/</div>`:'';
+    return `<div class="syllable-block">
+      <div class="syl-marks">${s.vowelMark?`<span style="color:${isOpen?'#00e5ff':'#ffb300'}">${s.vowelMark}</span>`:''}${yBadge}</div>
+      <div class="syl-text">${s.text}</div>
+      <div class="syl-scoop" style="width:${w}px;height:18px">${scoop}</div>
+      <div class="syl-type ${isOpen?'open-syl':'closed-syl'}">${isOpen?'open':'closed'}</div>
+    </div>${divider}`;
+  }).join('');
+}
+function buildEngineRule(item){
+  if(item.rule==='open'&&item.word&&['monkey','turkey','valley','honey','money'].includes(item.word))
+    return `<strong>⚠️ High-Frequency Exception</strong>This word uses <strong>-ey</strong> (not -y) — memorize these! Open first syllable with exception ending.`;
+  if(item.rule==='open')
+    return `<strong>🔓 Open Engine Configuration</strong>The first syllable ends in a vowel — engine is open, vowel is long. No doubling needed. The 'y' at end = long /ē/ sound.`;
+  return `<strong>🛡️ Double Shield — Rabbit Rule triggered</strong>Short vowel + single consonant = Rabbit Rule. Double the consonant to close the first syllable, keep the vowel short. Then add 'y' for the long /ē/ sound.`;
+}
+
+// ── CAMPAIGN START ──
+function startCampaign(){
+  G.playerName = document.getElementById('player-name').value.trim()||'Pilot';
+  G.token = document.querySelector('#p1-tokens .token-btn.selected').dataset.token;
+  const is2P = (G.mode==='local'||G.mode==='device');
+  if(is2P){
+    G.p2Name = document.getElementById('player2-name').value.trim()||'Co-Pilot';
+    G.p2Token = document.querySelector('#p2-tokens .token-btn.selected').dataset.token;
+    // prevent same token
+    if(G.p2Token===G.token){ alert('Co-pilots must choose different tokens!'); return; }
+    G.ariaOn = document.getElementById('aria-on-check').checked;
+  } else {
+    G.ariaOn = true;
+  }
+  G.completedMissions = [];
+  G.missionScores = [];
+  G.campaignPilotPts = 0;
+  G.campaignAriaPts = 0;
+  G.activePlayer = 1;
+  document.getElementById('map-pilot-icon').textContent = G.token;
+  document.getElementById('map-pilot-name').textContent = G.playerName;
+  // show P2 chip on map if 2P
+  const p2Chip = document.getElementById('map-p2-chip');
+  if(p2Chip){ p2Chip.style.display = is2P ? 'inline-flex' : 'none'; if(is2P){ p2Chip.innerHTML = `<span>${G.p2Token}</span><span id="map-p2-name">${G.p2Name}</span>`; } }
+  // show/hide ARIA-7 chip
+  const ariaChip = document.getElementById('map-aria-chip');
+  if(ariaChip) ariaChip.style.display = G.ariaOn ? 'inline-flex' : 'none';
+  renderMap();
+  showScreen('screen-map');
+}
+
+// ── MAP RENDER ──
+function renderMap(){
+  document.getElementById('aria-taunt').textContent = ARIA_TAUNTS[Math.min(G.completedMissions.length, ARIA_TAUNTS.length-1)];
+  const is2P = G.mode!=='solo';
+  const totalPts = G.missionScores.reduce((s,m)=>s+(m?m.spellScore||0:0),0);
+  const p2Pts   = is2P ? G.missionScores.reduce((s,m)=>s+(m?m.p2SpellScore||0:0),0) : 0;
+  const ariaPts = G.ariaOn ? G.missionScores.reduce((s,m)=>s+(m?m.ariaScore||0:0),0) : 0;
+  G.campaignPilotPts = totalPts; G.campaignAriaPts = ariaPts;
+  const grand = totalPts + p2Pts + ariaPts || 1;
+  document.getElementById('pilot-total-label').textContent = `${G.playerName.toUpperCase()} · ${totalPts} pts`;
+  document.getElementById('aria-total-label').textContent = G.ariaOn ? `ARIA-7 · ${ariaPts} pts` : (is2P?`${G.p2Name.toUpperCase()} · ${p2Pts} pts`:'');
+  document.getElementById('campaign-pilot-bar').style.width = (totalPts/grand*100)+'%';
+  document.getElementById('campaign-aria-bar').style.width = (G.ariaOn?ariaPts:p2Pts)/grand*100+'%';
+
+  // ARIA-7 taunt visible only if ariaOn
+  document.querySelector('.campaign-vs').style.display = G.ariaOn ? 'flex' : 'none';
+
+  const list = document.getElementById('mission-list');
+  list.innerHTML = MISSIONS.map((m,i)=>{
+    const done = G.completedMissions.includes(i);
+    const locked = i>0 && !G.completedMissions.includes(i-1);
+    const active = !locked && !done;
+    const sc = G.missionScores[i];
+    const badgeText = done ? (sc&&sc.passed?'✓ PASSED':'✓ DONE') : locked ? '🔒 LOCKED' : 'START →';
+    return `<div class="mission-card ${done?'completed':locked?'locked':active?'active-mission':''}" onclick="${locked?'':'startMission('+i+')'}" >
+      <div class="mc-top">
+        <div class="mc-num">${done?m.badge:locked?'🔒':m.id}</div>
+        <div class="mc-info">
+          <div class="mc-title">${m.title}</div>
+          <div class="mc-sub">${m.sub}</div>
+        </div>
+        <div class="mc-badge">${badgeText}${done&&sc?` · ${sc.spellScore}/${SPELL_DECKS[i].length}`:''}</div>
+      </div>
+      <div class="mc-steps">
+        <span class="step-dot ${done?'done':''}">BRIEFING</span>
+        <span class="step-dot ${done?'done':''}">TAP WARM-UP</span>
+        <span class="step-dot ${done?'done':''}">WORD SORT</span>
+        <span class="step-dot ${done?'done':''}">VS ARIA-7</span>
+        <span class="step-dot ${done?'done':''}">READING</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── START MISSION ──
+function startMission(idx){
+  G.currentMission = idx;
+  startStage('briefing');
+}
+
+function startStage(stage){
+  const mIdx = G.currentMission;
+  const m = MISSIONS[mIdx];
+  if(stage==='briefing'){
+    document.getElementById('brief-mission-title').textContent = `Mission ${m.id} · ${m.title}`;
+    document.getElementById('briefing-content').innerHTML = BRIEFINGS[mIdx];
+    showScreen('screen-briefing');
+  } else if(stage==='warmup'){
+    initTapWarmup(mIdx);
+    showScreen('screen-warmup');
+  } else if(stage==='sort'){
+    initSort(mIdx);
+    showScreen('screen-sort');
+  } else if(stage==='spell'){
+    initSpell(mIdx);
+    showScreen('screen-spell');
+  } else if(stage==='reading'){
+    initReading(mIdx);
+    showScreen('screen-reading');
+  }
+}
+
+// ── TAP WARM-UP ──
+function initTapWarmup(mIdx){
+  G.tapWords = TAP_WORDS[mIdx];
+  G.tapIdx = 0; G.tapCorrect = 0; G.tapP2Correct = 0; G.tapTapCount = 0; G.tapAnswered = false;
+  G.tapPhase = 1; G.activePlayer = 1;
+  const m = MISSIONS[mIdx];
+  document.getElementById('warmup-mission-title').textContent = `Mission ${m.id} · ${m.title}`;
+  const sub = document.getElementById('warmup-sub');
+  sub.textContent = G.mode==='local' ? `Stage 2 of 5 · Tap Warm-Up · ${G.playerName}'s round` : 'Stage 2 of 5 · Syllable Tap Warm-Up';
+  renderTapWord();
+}
+function renderTapWord(){
+  if(G.tapIdx >= G.tapWords.length){ completeTapWarmup(); return; }
+  const tw = G.tapWords[G.tapIdx];
+  G.tapTapCount = 0; G.tapAnswered = false;
+  document.getElementById('tap-word').textContent = tw.word.toUpperCase();
+  document.getElementById('tap-word').className = 'tap-word';
+  document.getElementById('tap-count').textContent = 'Tap to count syllables';
+  document.getElementById('tap-hint').textContent = 'Tap the word, then choose below';
+  document.getElementById('tap-prog-text').textContent = `Word ${G.tapIdx+1} of ${G.tapWords.length}`;
+  document.getElementById('tap-score-text').textContent = `${G.tapCorrect} correct`;
+  document.getElementById('tap-feedback').textContent = 'Tap the word to feel the syllables, then choose.';
+  document.getElementById('tap-feedback').className = 'tap-feedback tap-fb-neutral';
+  document.getElementById('tap-next-btn').style.display = 'none';
+  // Build options: 1, 2, 3, 4
+  const opts = document.getElementById('tap-options');
+  opts.innerHTML = [1,2,3,4].map(n=>`<button class="tap-opt" onclick="pickTap(this,${n})">${n}</button>`).join('');
+}
+function animateTap(){
+  if(G.tapAnswered) return;
+  G.tapTapCount++;
+  const tw = document.getElementById('tap-word');
+  tw.className = 'tap-word tapped';
+  setTimeout(()=>tw.className='tap-word',120);
+  document.getElementById('tap-count').textContent = `${G.tapTapCount} tap${G.tapTapCount!==1?'s':''}`;
+}
+function pickTap(btn, n){
+  if(G.tapAnswered) return;
+  G.tapAnswered = true;
+  const tw = G.tapWords[G.tapIdx];
+  document.querySelectorAll('.tap-opt').forEach(b=>b.disabled=true);
+  const fb = document.getElementById('tap-feedback');
+  const isCorrect = n===tw.count;
+  if(isCorrect){
+    btn.classList.add('correct');
+    if(G.tapPhase===1) G.tapCorrect++; else G.tapP2Correct++;
+    fb.textContent = `✓ Correct! "${tw.word}" has ${tw.count} syllable${tw.count>1?'s':''}.`;
+    fb.className = 'tap-feedback tap-fb-correct';
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.tap-opt').forEach(b=>{ if(parseInt(b.textContent)===tw.count) b.classList.add('correct'); });
+    fb.textContent = `"${tw.word}" has ${tw.count} syllable${tw.count>1?'s':''}. Keep tapping to feel the rhythm!`;
+    fb.className = 'tap-feedback tap-fb-wrong';
+  }
+  document.getElementById('tap-score-text').textContent = `${G.tapPhase===1?G.tapCorrect:G.tapP2Correct} correct`;
+  document.getElementById('tap-next-btn').style.display = 'block';
+}
+function nextTapWord(){ G.tapIdx++; renderTapWord(); }
+function completeTapWarmup(){
+  if(G.mode==='local' && G.tapPhase===1){
+    // P1 done — handoff to P2
+    G.tapPhase = 2; G.activePlayer = 2;
+    showHandoff(2, ()=>{
+      G.tapIdx = 0; G.tapAnswered = false; G.tapTapCount = 0;
+      document.getElementById('warmup-sub').textContent = `Stage 2 of 5 · Tap Warm-Up · ${G.p2Name}'s round`;
+      renderTapWord();
+    });
+  } else {
+    startStage('sort');
+  }
+}
+
+// ── WORD SORT ──
+let dragWord = null;
+function initSort(mIdx){
+  G.sortWords = SORT_SETS[mIdx];
+  const m = MISSIONS[mIdx];
+  document.getElementById('sort-mission-title').textContent = `Mission ${m.id} · ${m.title}`;
+  document.getElementById('sort-open-body').innerHTML = '';
+  document.getElementById('sort-double-body').innerHTML = '';
+  document.getElementById('sort-result').style.display = 'none';
+  document.getElementById('sort-check-btn').textContent = 'CHECK SORT →';
+  document.getElementById('sort-check-btn').disabled = false;
+  // Populate bank
+  const bank = document.getElementById('sort-bank');
+  bank.innerHTML = shuffle(G.sortWords).map(w=>
+    `<div class="sort-word" draggable="true" data-word="${w.word}" data-type="${w.type}" ondragstart="onDragStart(event)" ontouchstart="touchStart(event)" ontouchend="touchEnd(event)">${w.word}</div>`
+  ).join('');
+}
+function onDragStart(e){ dragWord = e.target; e.target.classList.add('dragging'); e.dataTransfer.setData('text/plain',e.target.dataset.word); }
+function onDragOver(e){ e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function onDragLeave(e){ e.currentTarget.classList.remove('drag-over'); }
+function onDrop(e, col){
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if(!dragWord) return;
+  dragWord.classList.remove('dragging');
+  const body = document.getElementById('sort-'+col+'-body');
+  // Remove from bank or other col
+  dragWord.remove();
+  // Add to column
+  dragWord.setAttribute('data-placed',col);
+  body.appendChild(dragWord);
+  dragWord = null;
+}
+// Touch drag fallback
+let touchEl=null, touchClone=null, touchPlacedCol=null;
+function touchStart(e){
+  touchEl=e.currentTarget;
+  touchEl.style.opacity='0.4';
+}
+function touchEnd(e){
+  if(!touchEl) return;
+  touchEl.style.opacity='1';
+  const touch=e.changedTouches[0];
+  const target=document.elementFromPoint(touch.clientX,touch.clientY);
+  const col = target&&target.closest('.sort-col');
+  if(col){
+    const colId = col.id==='sort-open'?'open':'double';
+    const body = document.getElementById('sort-'+colId+'-body');
+    touchEl.setAttribute('data-placed',colId);
+    body.appendChild(touchEl);
+  }
+  touchEl=null;
+}
+function checkSort(){
+  const placed = document.querySelectorAll('[data-placed]');
+  if(placed.length < G.sortWords.length){
+    document.getElementById('sort-result').style.display='block';
+    document.getElementById('sort-result').innerHTML='<p style="color:var(--amber);font-family:Orbitron,monospace;font-size:0.7rem">Sort all words before checking!</p>';
+    return;
+  }
+  let correct=0;
+  placed.forEach(el=>{
+    const placed_col = el.getAttribute('data-placed');
+    const correct_col = el.getAttribute('data-type');
+    if(placed_col===correct_col){ el.classList.add('correct-placed'); correct++; }
+    else { el.classList.add('wrong-placed'); }
+  });
+  const pct = Math.round(correct/G.sortWords.length*100);
+  document.getElementById('sort-result').style.display='block';
+  document.getElementById('sort-result').innerHTML=`<div class="sort-score">${correct}/${G.sortWords.length}</div><p style="color:var(--muted)">${pct>=80?'Great sort, pilot! Engines calibrated.':'Review the incorrect ones, then proceed.'}</p>`;
+  document.getElementById('sort-check-btn').textContent = 'PROCEED TO SPELLING CHALLENGE →';
+  document.getElementById('sort-check-btn').onclick = ()=>startStage('spell');
+}
+
+// ── SPELL CHALLENGE ──
+function initSpell(mIdx){
+  G.spellDeck = buildSpellDeck(mIdx);
+  G.spellIdx = 0; G.spellMyScore = 0; G.spellP2Score = 0; G.spellAriaScore = 0; G.spellAnswered = false;
+  G.activePlayer = 1;
+  const m = MISSIONS[mIdx];
+  const is2P = G.mode!=='solo';
+  document.getElementById('spell-mission-title').textContent = `Mission ${m.id} · ${m.title}`;
+  document.getElementById('spell-my-name').textContent = G.playerName;
+  document.getElementById('spell-my-score').textContent = '0';
+  document.getElementById('spell-aria-score').textContent = '0';
+  document.getElementById('spell-traj-end').textContent = `Word ${G.spellDeck.length} 🌕`;
+  document.getElementById('repair-panel').style.display='none';
+  document.getElementById('spell-next-btn').style.display='none';
+  // P2 tile
+  const p2tile = document.getElementById('spell-p2-tile');
+  p2tile.style.display = is2P ? 'block' : 'none';
+  document.getElementById('spell-p2-name').textContent = G.p2Name;
+  document.getElementById('spell-p2-score').textContent = '0';
+  // ARIA tile
+  document.getElementById('spell-aria-tile').style.display = G.ariaOn ? 'block' : 'none';
+  // scores layout
+  const sc = document.getElementById('spell-scores');
+  sc.className = 'scores' + (is2P && G.ariaOn ? ' sc3' : '');
+  renderSpellWord();
+}
+function renderSpellWord(){
+  if(G.spellIdx>=G.spellDeck.length){ finishSpell(); return; }
+  const item = G.spellDeck[G.spellIdx];
+  G.spellAnswered = false;
+  setActivePilotBanner('spell-apb');
+  document.getElementById('spell-traj-fill').style.width=(G.spellIdx/G.spellDeck.length*100)+'%';
+  const lbl = document.getElementById('spell-orbit-label');
+  lbl.textContent = MISSIONS[G.currentMission].orbitLabel;
+  lbl.className = 'orbit-label '+MISSIONS[G.currentMission].orbitClass;
+  const rb = document.getElementById('spell-reentry-badge');
+  rb.style.display = item.isReentry?'inline-block':'none';
+  document.getElementById('spell-word-stem').textContent = item.word.replace(/[aeiou]/gi,'·').slice(0,-1)+'___';
+  document.getElementById('spell-word-hint').textContent = 'Analyze the engine room · choose the correct spelling';
+  document.getElementById('spell-orbit-hint').textContent = item.rule==='open'?'🔓 Open Engine · long vowel ahead':'🛡️ Double Shield · Rabbit Rule check';
+  document.getElementById('spell-choices').innerHTML = shuffle(item.choices).map(c=>`<button class="choice-btn" onclick="pickSpell(this,'${c}','${item.word}')">${c}</button>`).join('');
+  document.getElementById('spell-feedback').textContent='Select the correctly spelled word';
+  document.getElementById('spell-feedback').className='feedback neutral';
+  document.getElementById('repair-panel').style.display='none';
+  document.getElementById('spell-next-btn').style.display='none';
+  // ARIA-7 "thinks"
+  const aria = document.getElementById('aria-thinking');
+  aria.classList.add('show');
+  setTimeout(()=>aria.classList.remove('show'), 900+Math.random()*600);
+}
+function pickSpell(btn,choice,answer){
+  if(G.spellAnswered) return;
+  G.spellAnswered = true;
+  const item = G.spellDeck[G.spellIdx];
+  const isP2Turn = (G.mode==='local' && G.activePlayer===2);
+  document.querySelectorAll('.choice-btn').forEach(b=>{b.disabled=true;if(b.textContent===answer) b.classList.add('reveal');});
+  const fb = document.getElementById('spell-feedback');
+  // ARIA-7 answer simulation
+  if(G.ariaOn){ const ariaRight = Math.random()<ARIA_ACCURACY[G.currentMission]; if(ariaRight && !item.isReentry) G.spellAriaScore++; document.getElementById('spell-aria-score').textContent = G.spellAriaScore; }
+  if(choice===answer){
+    btn.classList.remove('reveal'); btn.classList.add('correct');
+    const pts = item.isReentry ? 0.5 : 1;
+    if(isP2Turn){ G.spellP2Score+=pts; document.getElementById('spell-p2-score').textContent=Math.round(G.spellP2Score); }
+    else { G.spellMyScore+=pts; document.getElementById('spell-my-score').textContent=Math.round(G.spellMyScore); }
+    fb.innerHTML=`<span class="rule-label">✓ ${item.isReentry?'Re-entry success! (+0.5)':'Correct!'}</span>${item.feedback}`;
+    fb.className='feedback correct';
+    document.getElementById('repair-panel').style.display='none';
+    document.getElementById('spell-next-btn').style.display='block';
+  } else {
+    btn.classList.add('wrong');
+    fb.innerHTML=`<span class="rule-label">✗ Engine damage! Correct: "${answer}"</span>${item.feedback}`;
+    fb.className='feedback wrong-fb';
+    document.getElementById('spell-next-btn').style.display='none';
+    showRepairPanel(item);
+    if(!item.isReentry){ const clone={...item,isReentry:true}; const at=Math.min(G.spellIdx+2+Math.floor(Math.random()*2),G.spellDeck.length); G.spellDeck.splice(at,0,clone); }
+  }
+}
+function showRepairPanel(item){
+  G.repairTarget = item.word;
+  document.getElementById('scoop-display').innerHTML = buildScoopDisplay(item.syllables);
+  document.getElementById('engine-rule').innerHTML = buildEngineRule(item);
+  const inp = document.getElementById('repair-input');
+  inp.value=''; inp.className='repair-input';
+  document.getElementById('repair-hint').textContent='Type the word exactly as shown above';
+  document.getElementById('repair-hint').className='repair-hint';
+  document.getElementById('btn-repair').disabled=false;
+  document.getElementById('repair-panel').style.display='block';
+  setTimeout(()=>inp.focus(),100);
+}
+document.getElementById('repair-input').addEventListener('input',function(){
+  const val=this.value.trim().toLowerCase();
+  const target=G.repairTarget.toLowerCase();
+  const hint=document.getElementById('repair-hint');
+  if(!val){this.className='repair-input';hint.textContent='Type the word exactly as shown above';hint.className='repair-hint';return;}
+  if(target.startsWith(val)){
+    this.className='repair-input';
+    const rem=target.slice(val.length);
+    hint.textContent=rem?`Keep going… ${rem.length} letter${rem.length>1?'s':''} to go`:'Looking good — hit Engage!';
+    hint.className='repair-hint hint-ok';
+  } else {
+    hint.textContent='Check your spelling — look at the syllable breakdown above';
+    hint.className='repair-hint hint-err';
+  }
+});
+document.getElementById('repair-input').addEventListener('keydown',e=>{if(e.key==='Enter') submitRepair();});
+function submitRepair(){
+  const inp=document.getElementById('repair-input');
+  const val=inp.value.trim().toLowerCase();
+  const hint=document.getElementById('repair-hint');
+  if(val===G.repairTarget.toLowerCase()){
+    inp.className='repair-input input-ok';
+    hint.textContent='✓ Engine repaired! Word returns to deck.';
+    hint.className='repair-hint hint-ok';
+    document.getElementById('btn-repair').disabled=true;
+    document.getElementById('spell-next-btn').style.display='block';
+  } else {
+    inp.className='repair-input input-err';
+    hint.textContent=`Not quite — correct spelling is "${G.repairTarget}". Try again.`;
+    hint.className='repair-hint hint-err';
+    setTimeout(()=>inp.className='repair-input',400);
+  }
+}
+function nextSpellWord(){
+  G.spellIdx++;
+  if(G.mode==='local' && G.spellIdx < G.spellDeck.length){
+    // Alternate turns: handoff every word
+    const next = G.activePlayer===1 ? 2 : 1;
+    G.activePlayer = next;
+    showHandoff(next, renderSpellWord);
+  } else {
+    renderSpellWord();
+  }
+}
+function finishSpell(){ startStage('reading'); }
+
+// ── READING COMP ──
+function initReading(mIdx){
+  const r = READINGS[mIdx];
+  G.readQs = r.questions;
+  G.readIdx = 0; G.readCorrect = 0; G.readAnswered = false;
+  const m = MISSIONS[mIdx];
+  document.getElementById('read-mission-title').textContent = `Mission ${m.id} · ${m.title}`;
+  document.getElementById('reading-content').innerHTML = `
+    <div class="passage-card">
+      <div class="passage-title">📖 ${r.title}</div>
+      <p class="passage-text">${r.text}</p>
+    </div>`;
+  renderCompQuestion();
+}
+function renderCompQuestion(){
+  if(G.readIdx>=G.readQs.length){
+    // All done
+    document.getElementById('read-finish-btn').style.display='block';
+    return;
+  }
+  const q = G.readQs[G.readIdx];
+  G.readAnswered = false;
+  document.getElementById('comp-questions').innerHTML = `
+    <div class="comp-question">
+      <div class="cq-num">Question ${G.readIdx+1} of ${G.readQs.length}</div>
+      <div class="cq-text">${q.q}</div>
+      <div class="comp-options">${q.options.map((o,i)=>`<button class="comp-opt" onclick="pickComp(this,${i},${q.answer})">${o}</button>`).join('')}</div>
+    </div>`;
+  document.getElementById('read-feedback').style.display='none';
+  document.getElementById('read-finish-btn').style.display='none';
+}
+function pickComp(btn,idx,answer){
+  if(G.readAnswered) return;
+  G.readAnswered=true;
+  document.querySelectorAll('.comp-opt').forEach((b,i)=>{b.disabled=true;if(i===answer) b.classList.add('correct');});
+  const fb=document.getElementById('read-feedback');
+  if(idx===answer){
+    btn.classList.remove('correct'); btn.classList.add('correct');
+    G.readCorrect++;
+    fb.textContent='✓ Correct!'; fb.className='feedback correct'; fb.style.display='block';
+  } else {
+    btn.classList.add('wrong');
+    fb.textContent=`Not quite. The correct answer is: "${G.readQs[G.readIdx].options[answer]}"`; fb.className='feedback wrong-fb'; fb.style.display='block';
+  }
+  setTimeout(()=>{ G.readIdx++; renderCompQuestion(); }, 1200);
+}
+function finishMission(){
+  const mIdx = G.currentMission;
+  const spellTotal = SPELL_DECKS[mIdx].length;
+  const ariaScore = G.ariaOn ? ariaAnswers(mIdx) : 0;
+  const passed = G.spellMyScore >= spellTotal * 0.7;
+  G.missionScores[mIdx] = {
+    spellScore: Math.round(G.spellMyScore),
+    p2SpellScore: Math.round(G.spellP2Score),
+    spellTotal,
+    sortScore: G.sortWords.length,
+    tapScore: G.tapCorrect,
+    tapP2Score: G.tapP2Correct,
+    readScore: G.readCorrect,
+    readP2Score: G.readP2Correct,
+    readTotal: G.readQs.length,
+    ariaScore,
+    passed,
+    date: new Date().toLocaleDateString(),
+  };
+  if(!G.completedMissions.includes(mIdx)) G.completedMissions.push(mIdx);
+  showDebrief(mIdx);
+}
+
+// ── DEBRIEF ──
+function showDebrief(mIdx){
+  const m = MISSIONS[mIdx];
+  const sc = G.missionScores[mIdx];
+  const is2P = G.mode!=='solo';
+  // Build ranked list
+  const players = [{name:G.playerName,tok:G.token,score:sc.spellScore,read:sc.readScore,tap:sc.tapScore}];
+  if(is2P) players.push({name:G.p2Name,tok:G.p2Token,score:sc.p2SpellScore,read:sc.readP2Score,tap:sc.tapP2Score,isP2:true});
+  if(G.ariaOn) players.push({name:'ARIA-7',tok:'🤖',score:sc.ariaScore,read:'—',tap:'—',isAria:true});
+  players.sort((a,b)=>b.score-a.score);
+  const winner = players[0];
+  const pct = Math.round(sc.spellScore/sc.spellTotal*100);
+  const hasNext = mIdx < MISSIONS.length-1;
+  const vsRows = players.map((p,i)=>{
+    const crown = i===0?' 👑':'';
+    const color = p.isAria?'var(--red)':p.isP2?'var(--p2)':'var(--purple)';
+    return `<div class="vs-row" style="color:${color}">${p.tok} ${p.name}: ${p.score}${crown}</div>`;
+  }).join('');
+  const winMsg = winner.isAria ? 'ARIA-7 wins this round. Keep training!' : winner.isP2 ? `${G.p2Token} ${G.p2Name} wins this mission!` : `✓ ${G.playerName} defeated all rivals!`;
+  const winColor = winner.isAria?'var(--red)':winner.isP2?'var(--p2)':'var(--green)';
+  document.getElementById('debrief-content').innerHTML = `
+    <div class="badge-ring">${m.badge}</div>
+    <div class="debrief-title">${pct>=90?'🌕 y Moon Reached!':pct>=70?'🚀 Mission Complete!':'📡 Training Complete'}</div>
+    <div class="debrief-sub">${m.badgeTitle} Badge · ${G.playerName}${is2P?' &amp; '+G.p2Name:''}</div>
+    <div class="debrief-stats">
+      <div class="ds-tile"><div class="ds-val" style="color:var(--cyan)">${sc.spellScore}/${sc.spellTotal}</div><div class="ds-lbl">${G.playerName}<br>Spelling</div></div>
+      ${is2P?`<div class="ds-tile"><div class="ds-val" style="color:var(--p2)">${sc.p2SpellScore}/${sc.spellTotal}</div><div class="ds-lbl">${G.p2Name}<br>Spelling</div></div>`:''}
+      <div class="ds-tile"><div class="ds-val" style="color:var(--green)">${sc.tapScore}/${G.tapWords?G.tapWords.length:6}</div><div class="ds-lbl">Tap<br>Warm-Up</div></div>
+      <div class="ds-tile"><div class="ds-val" style="color:var(--amber)">${sc.readScore}/${sc.readTotal}</div><div class="ds-lbl">Reading</div></div>
+    </div>
+    <div class="vs-result">
+      ${vsRows}
+      <div style="font-family:Orbitron,monospace;font-size:0.65rem;color:${winColor};margin-top:0.5rem">${winMsg}</div>
+    </div>`;
+  const btnNext = document.getElementById('btn-next-mission');
+  if(hasNext){ btnNext.style.display='block'; btnNext.textContent = `MISSION ${mIdx+2}: ${MISSIONS[mIdx+1].title.split('—')[0].trim()} →`; }
+  else { btnNext.style.display='none'; }
+  showScreen('screen-debrief');
+}
+function goNextMission(){
+  const next = G.currentMission+1;
+  if(next<MISSIONS.length){ G.currentMission=next; startStage('briefing'); }
+  else { renderMap(); showScreen('screen-map'); }
+}
+
+// ── PILOT LOG ──
+function showLog(){
+  const logEl = document.getElementById('log-content');
+  if(!G.missionScores.length){ logEl.innerHTML='<p style="color:var(--muted);font-size:0.85rem;padding:1rem">No missions completed yet.</p>'; return; }
+  logEl.innerHTML = G.missionScores.map((sc,i)=>{
+    if(!sc) return '';
+    const m = MISSIONS[i];
+    return `<div class="log-entry">
+      <div class="le-left"><div class="le-mission">Mission ${m.id}</div>${m.title}</div>
+      <div class="le-right">${sc.spellScore}/${sc.spellTotal} · ${sc.date||''}</div>
+    </div>`;
+  }).join('');
+}
+document.querySelector('[onclick="showScreen(\'screen-log\')"]').addEventListener('click',showLog,true);
+
+// ── CSV EXPORT ──
+function downloadCSV(){
+  const is2P = G.mode!=='solo';
+  const headers = ['Mission','Title','Step','Date','P1 Spell','P1 Tap','P1 Read','Spell Total'];
+  if(is2P) headers.push('P2 Spell','P2 Tap','P2 Read');
+  if(G.ariaOn) headers.push('ARIA-7 Spell');
+  headers.push('Winner');
+  const rows = [headers];
+  G.missionScores.forEach((sc,i)=>{
+    if(!sc) return;
+    const m = MISSIONS[i];
+    const players = [{n:G.playerName,s:sc.spellScore}];
+    if(is2P) players.push({n:G.p2Name,s:sc.p2SpellScore});
+    if(G.ariaOn) players.push({n:'ARIA-7',s:sc.ariaScore});
+    players.sort((a,b)=>b.s-a.s);
+    const row = [m.id,m.title,m.step,sc.date||'',sc.spellScore,sc.tapScore,sc.readScore,sc.spellTotal];
+    if(is2P) row.push(sc.p2SpellScore,sc.tapP2Score,sc.readP2Score);
+    if(G.ariaOn) row.push(sc.ariaScore);
+    row.push(players[0].n);
+    rows.push(row);
+  });
+  const csv = rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
+  const blob = new Blob([csv],{type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=`nebula-y-${G.playerName.replace(/\s+/g,'-')}-progress.csv`; a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>
