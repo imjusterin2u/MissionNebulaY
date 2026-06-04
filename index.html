@@ -13,7 +13,7 @@
     from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
   const firebaseConfig = {
-    apiKey:            "AIzaSyAAbXOkCB7WnASAIAMnNRUah-1U9xByXjM",
+    apiKey:            "AIzaSyCwuDa5M3mqhLolLChYXqhYOQiu86WiQD4",
     authDomain:        "mission-nebula-y.firebaseapp.com",
     projectId:         "mission-nebula-y",
     storageBucket:     "mission-nebula-y.firebasestorage.app",
@@ -715,7 +715,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="debrief-card" id="debrief-content"></div>
   <button class="btn-csv" onclick="downloadCSV()">📊 Download Pilot Log CSV</button>
   <button class="btn-next-mission" id="btn-next-mission" onclick="goNextMission()">NEXT MISSION →</button>
-  <button class="btn-back-map" onclick="renderMap();showScreen('screen-map')">← RETURN TO CAMPAIGN MAP</button>
+  <button class="btn-back-map" onclick="returnToMap()">← RETURN TO CAMPAIGN MAP</button>
 </div>
 
 <!-- ═══ PILOT LOG ═══ -->
@@ -2034,6 +2034,9 @@ function finishMission(){
     date: new Date().toLocaleDateString(),
   };
   if(!G.completedMissions.includes(mIdx)) G.completedMissions.push(mIdx);
+  if(!G.spellMissed) G.spellMissed = [];
+  // Auto-save to Firebase (async, non-blocking)
+  if(window._fb) fbSaveMission(mIdx);
   showDebrief(mIdx);
 }
 
@@ -2081,6 +2084,10 @@ function goNextMission(){
   const next = G.currentMission+1;
   if(next<MISSIONS.length){ G.currentMission=next; startStage('briefing'); }
   else { renderMap(); showScreen('screen-map'); }
+}
+function returnToMap(){
+  renderMap();
+  showScreen('screen-map');
 }
 
 // ── PILOT LOG ──
@@ -2364,16 +2371,8 @@ function printReport(){
   window.print();
 }
 
-// ── Wire auto-save into finishMission ──
-// Called after missionScores is set
-const _origShowDebrief = showDebrief;
-function showDebrief(mIdx){
-  // Track missed words from current spell run
-  if(!G.spellMissed) G.spellMissed = [];
-  _origShowDebrief(mIdx);
-  // Auto-save to Firebase (async, non-blocking)
-  fbSaveMission(mIdx);
-}
+// ── Firebase auto-save is called directly from finishMission ──
+// (no showDebrief override needed)
 
 </script>
 </body>
