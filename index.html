@@ -4,6 +4,31 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mission: Nebula-Y</title>
+<!-- Firebase SDK -->
+<script type="module" id="firebase-module">
+  // ── FIREBASE CONFIG ── Replace these placeholder values with your project's config
+  // Get them from: Firebase Console → Project Settings → Your Apps → Web App
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, query, orderBy, serverTimestamp }
+    from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyAAbXOkCB7WnASAIAMnNRUah-1U9xByXjM",
+    authDomain:        "mission-nebula-y.firebaseapp.com",
+    projectId:         "mission-nebula-y",
+    storageBucket:     "mission-nebula-y.firebasestorage.app",
+    messagingSenderId: "1037353268624",
+    appId:             "1:1037353268624:web:da780f0ebf95e07ecd6f15"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  // Expose to global scope for use by inline scripts
+  window._fb = { db, collection, addDoc, getDocs, doc, setDoc, getDoc, query, orderBy, serverTimestamp };
+  window._fbReady = true;
+  document.dispatchEvent(new Event('firebase-ready'));
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -116,6 +141,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 /* ── SYLLABLE TAP ── */
 .tap-word-display{text-align:center;padding:2rem 1rem;background:rgba(13,17,48,0.85);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:1rem;}
 .tap-word{font-family:'Orbitron',monospace;font-size:2.8rem;font-weight:900;color:#fff;letter-spacing:3px;cursor:pointer;user-select:none;transition:transform 0.1s;}
+.tap-word.tap-word-longi{color:var(--amber);text-shadow:0 0 12px var(--amber-glow);}
 .tap-word.tapped{transform:scale(1.05);}
 .tap-count{font-family:'Orbitron',monospace;font-size:1rem;color:var(--cyan);margin-top:0.75rem;}
 .tap-hint{font-size:0.8rem;color:var(--muted);margin-top:0.4rem;}
@@ -269,8 +295,82 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .btn-back-map{width:100%;padding:0.75rem;background:transparent;border:1px solid var(--border);border-radius:var(--radius);color:var(--muted);font-family:'Orbitron',monospace;font-size:0.7rem;cursor:pointer;margin-top:0.5rem;transition:all 0.2s;}
 .btn-back-map:hover{border-color:var(--cyan);color:var(--cyan);}
 
+/* ── RETELL ── */
+.retell-intro{display:flex;align-items:center;gap:0.6rem;background:rgba(0,229,255,0.07);border:1px solid rgba(0,229,255,0.2);border-radius:10px;padding:0.75rem 1rem;font-size:0.82rem;color:var(--muted);margin-bottom:1.2rem;}
+.retell-icon{font-size:1.4rem;}
+.retell-arena{display:flex;flex-direction:column;gap:1rem;}
+.retell-slots{display:flex;flex-direction:column;gap:0.6rem;}
+.retell-slot{min-height:56px;border:2px dashed rgba(176,108,255,0.35);border-radius:10px;display:flex;align-items:center;gap:0.75rem;padding:0.4rem 0.75rem;transition:border-color 0.2s,background 0.2s;background:rgba(176,108,255,0.04);}
+.retell-slot.drag-over{border-color:var(--purple);background:rgba(176,108,255,0.13);}
+.retell-slot.filled{border-style:solid;border-color:rgba(176,108,255,0.5);}
+.retell-slot.correct-slot{border-color:var(--green);background:rgba(57,255,122,0.08);}
+.retell-slot.wrong-slot{border-color:var(--red);background:rgba(255,78,106,0.08);}
+.retell-slot-label{font-family:'Orbitron',monospace;font-size:0.62rem;font-weight:700;color:var(--purple);min-width:44px;text-align:center;white-space:nowrap;}
+.retell-slot-label.first{color:#00e5ff;}
+.retell-slot-label.next{color:#b06cff;}
+.retell-slot-label.then{color:#ffb300;}
+.retell-slot-label.last{color:#39ff7a;}
+.retell-slot-content{flex:1;font-size:0.82rem;color:var(--text);line-height:1.4;}
+.retell-bank-label{font-family:'Orbitron',monospace;font-size:0.6rem;color:var(--muted);letter-spacing:1px;margin-top:0.4rem;}
+.retell-bank{display:flex;flex-direction:column;gap:0.5rem;min-height:40px;}
+.retell-card{background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.15);border-radius:9px;padding:0.65rem 0.9rem;font-size:0.82rem;color:var(--text);cursor:grab;user-select:none;transition:border-color 0.15s,background 0.15s,transform 0.15s;line-height:1.4;display:flex;align-items:center;gap:0.5rem;}
+.retell-card::before{content:'⠿';color:var(--muted);font-size:1rem;flex-shrink:0;}
+.retell-card:hover{border-color:var(--purple);background:rgba(176,108,255,0.1);transform:translateY(-1px);}
+.retell-card.dragging{opacity:0.4;transform:scale(0.97);}
+.retell-feedback{padding:0.9rem 1rem;border-radius:10px;font-size:0.85rem;line-height:1.5;}
+.retell-feedback.rf-correct{background:rgba(57,255,122,0.1);border:1px solid var(--green);color:var(--green);}
+.retell-feedback.rf-partial{background:rgba(255,179,0,0.1);border:1px solid var(--amber);color:var(--amber);}
+.retell-card.touch-selected{border-color:var(--cyan);background:rgba(0,229,255,0.13);box-shadow:0 0 10px rgba(0,229,255,0.3);}
+/* ── TEACHER PIN ── */
+.pin-card{background:var(--space2);border:1px solid var(--border);border-radius:var(--radius);padding:2rem 1.5rem;text-align:center;margin-top:1rem;}
+.pin-icon{font-size:2.5rem;margin-bottom:0.75rem;}
+.pin-label{font-family:'Orbitron',monospace;font-size:0.75rem;color:var(--muted);letter-spacing:2px;margin-bottom:0.75rem;}
+.pin-input{width:100%;background:rgba(255,255,255,0.06);border:1.5px solid var(--border);border-radius:10px;padding:0.75rem 1rem;font-size:1.4rem;color:var(--text);text-align:center;letter-spacing:6px;outline:none;transition:border-color 0.2s;}
+.pin-input:focus{border-color:var(--purple);}
+.pin-error{color:var(--red);font-size:0.78rem;margin-top:0.5rem;}
+/* ── TEACHER DASHBOARD ── */
+.dash-toolbar{display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;}
+.dash-btn{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:0.45rem 0.9rem;font-family:'Orbitron',monospace;font-size:0.62rem;color:var(--muted);cursor:pointer;transition:all 0.2s;}
+.dash-btn.active,.dash-btn:hover{background:rgba(176,108,255,0.15);border-color:var(--purple);color:var(--purple);}
+.dash-btn.print-btn{margin-left:auto;color:var(--cyan);border-color:var(--cyan);}
+.dash-btn.print-btn:hover{background:rgba(0,229,255,0.1);}
+.student-card{background:var(--space2);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.1rem;margin-bottom:0.7rem;cursor:pointer;transition:border-color 0.2s,background 0.2s;}
+.student-card:hover{border-color:var(--purple);background:rgba(176,108,255,0.07);}
+.sc-header{display:flex;align-items:center;gap:0.75rem;margin-bottom:0.6rem;}
+.sc-avatar{font-size:1.4rem;}
+.sc-name{font-family:'Orbitron',monospace;font-size:0.8rem;font-weight:700;color:var(--text);}
+.sc-date{font-size:0.7rem;color:var(--muted);margin-left:auto;}
+.sc-missions{display:flex;gap:0.4rem;flex-wrap:wrap;}
+.sc-mission-pill{font-size:0.68rem;padding:0.2rem 0.55rem;border-radius:20px;font-weight:600;}
+.smp-done{background:rgba(57,255,122,0.15);color:var(--green);border:1px solid rgba(57,255,122,0.3);}
+.smp-partial{background:rgba(255,179,0,0.15);color:var(--amber);border:1px solid rgba(255,179,0,0.3);}
+.smp-todo{background:rgba(255,255,255,0.05);color:var(--muted);border:1px solid var(--border);}
+.mission-detail-card{background:var(--space2);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.1rem;margin-bottom:0.7rem;}
+.mdc-title{font-family:'Orbitron',monospace;font-size:0.72rem;color:var(--purple);margin-bottom:0.75rem;display:flex;justify-content:space-between;}
+.mdc-scores{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:0.5rem;margin-bottom:0.75rem;}
+.mdc-score{background:rgba(255,255,255,0.04);border-radius:8px;padding:0.45rem 0.5rem;text-align:center;}
+.mdc-val{font-family:'Orbitron',monospace;font-size:0.95rem;font-weight:700;}
+.mdc-lbl{font-size:0.6rem;color:var(--muted);margin-top:0.15rem;}
+.mdc-missed{margin-top:0.5rem;}
+.mdc-missed-label{font-size:0.68rem;color:var(--muted);margin-bottom:0.35rem;}
+.missed-words{display:flex;flex-wrap:wrap;gap:0.3rem;}
+.missed-word{background:rgba(255,78,106,0.12);border:1px solid rgba(255,78,106,0.3);color:var(--red);border-radius:6px;padding:0.15rem 0.45rem;font-size:0.72rem;}
+.dash-empty{text-align:center;padding:2rem;color:var(--muted);font-size:0.85rem;}
+.back-to-all{font-family:'Orbitron',monospace;font-size:0.65rem;color:var(--cyan);cursor:pointer;margin-bottom:1rem;display:inline-flex;align-items:center;gap:0.3rem;}
+.back-to-all:hover{text-decoration:underline;}
+.dash-fb-status{font-size:0.72rem;padding:0.5rem 0.75rem;border-radius:8px;margin-bottom:0.75rem;}
+.fb-ok{background:rgba(57,255,122,0.1);color:var(--green);}
+.fb-err{background:rgba(255,78,106,0.1);color:var(--red);}
+.fb-loading{background:rgba(0,229,255,0.07);color:var(--cyan);}
+@media print{
+  body::before,.stars,.stage-header,.dash-toolbar{display:none!important;}
+  body{background:#fff;color:#000;}
+  #screen-teacher-pin,#screen-map,#screen-setup,#screen-briefing,#screen-tap,#screen-sort,#screen-spell,#screen-reading,#screen-retell,#screen-debrief,#screen-log{display:none!important;}
+  #screen-teacher{display:block!important;}
+  .student-card,.mission-detail-card{border:1px solid #ccc;break-inside:avoid;}
+  .sc-name,.mdc-title{color:#000;} .mdc-val{color:#333;}
+}
 /* ── PILOT LOG ── */
-.log-card{background:rgba(13,17,48,0.85);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem;}
 .log-entry{display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0;border-bottom:1px solid var(--border);}
 .log-entry:last-child{border-bottom:none;}
 .le-left{font-size:0.82rem;color:var(--text);}
@@ -436,13 +536,14 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="mission-list" id="mission-list"></div>
   <div style="text-align:center">
     <button class="btn-action" onclick="showScreen('screen-log')" style="margin:0 auto">📋 View Pilot Log</button>
+    <button class="btn-action" onclick="showTeacherPin()" style="margin:0 auto;background:rgba(176,108,255,0.15);border:1px solid var(--purple)">🔐 Teacher Dashboard</button>
   </div>
 </div>
 
 <!-- ═══ BRIEFING STAGE ═══ -->
 <div id="screen-briefing" class="screen">
   <div class="stage-header">
-    <button class="back-btn" onclick="showScreen('screen-map')">← MAP</button>
+    <button class="back-btn" onclick="renderMap();showScreen('screen-map')">← MAP</button>
     <div><div class="stage-title" id="brief-mission-title">Mission 1</div><div class="stage-sub">Stage 1 of 5 · Concept Briefing</div></div>
   </div>
   <div class="stage-progress">
@@ -459,7 +560,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 <!-- ═══ WARMUP (TAP) STAGE ═══ -->
 <div id="screen-warmup" class="screen">
   <div class="stage-header">
-    <button class="back-btn" onclick="showScreen('screen-map')">← MAP</button>
+    <button class="back-btn" onclick="renderMap();showScreen('screen-map')">← MAP</button>
     <div><div class="stage-title" id="warmup-mission-title">Mission 1</div><div class="stage-sub" id="warmup-sub">Stage 2 of 5 · Syllable Tap Warm-Up</div></div>
   </div>
   <div class="stage-progress">
@@ -483,7 +584,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 <!-- ═══ SORT STAGE ═══ -->
 <div id="screen-sort" class="screen">
   <div class="stage-header">
-    <button class="back-btn" onclick="showScreen('screen-map')">← MAP</button>
+    <button class="back-btn" onclick="renderMap();showScreen('screen-map')">← MAP</button>
     <div><div class="stage-title" id="sort-mission-title">Mission 1</div><div class="stage-sub">Stage 3 of 5 · Word Sort</div></div>
   </div>
   <div class="stage-progress">
@@ -509,7 +610,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 <!-- ═══ SPELLING CHALLENGE (vs ARIA-7) STAGE ═══ -->
 <div id="screen-spell" class="screen">
   <div class="stage-header">
-    <button class="back-btn" onclick="showScreen('screen-map')">← MAP</button>
+    <button class="back-btn" onclick="renderMap();showScreen('screen-map')">← MAP</button>
     <div><div class="stage-title" id="spell-mission-title">Mission 1</div><div class="stage-sub">Stage 4 of 5 · Spelling Challenge vs ARIA-7</div></div>
   </div>
   <div class="stage-progress">
@@ -572,7 +673,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 <!-- ═══ READING COMP STAGE ═══ -->
 <div id="screen-reading" class="screen">
   <div class="stage-header">
-    <button class="back-btn" onclick="showScreen('screen-map')">← MAP</button>
+    <button class="back-btn" onclick="renderMap();showScreen('screen-map')">← MAP</button>
     <div><div class="stage-title" id="read-mission-title">Mission 1</div><div class="stage-sub">Stage 5 of 5 · Reading Comprehension</div></div>
   </div>
   <div class="stage-progress">
@@ -582,7 +683,31 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div id="reading-content"></div>
   <div id="comp-questions"></div>
   <div class="feedback neutral" id="read-feedback" style="display:none"></div>
-  <button class="btn-action" id="read-finish-btn" style="width:100%;display:none" onclick="finishMission()">MISSION DEBRIEF →</button>
+  <button class="btn-action" id="read-finish-btn" style="width:100%;display:none" onclick="startRetell()">RETELL THE STORY →</button>
+</div>
+
+<!-- ═══ RETELL STAGE ═══ -->
+<div id="screen-retell" class="screen">
+  <div class="stage-header">
+    <button class="back-btn" onclick="renderMap();showScreen('screen-map')">← MAP</button>
+    <div><div class="stage-title" id="retell-mission-title">Mission 1</div><div class="stage-sub" id="retell-sub">Story Retell · Put the events in order</div></div>
+  </div>
+  <div class="retell-intro">
+    <span class="retell-icon">📖</span>
+    <span>Drag each event card into the correct slot — <strong>First, Next, Then, Last</strong></span>
+  </div>
+  <div class="retell-arena">
+    <div class="retell-slots" id="retell-slots">
+      <!-- slots injected by JS -->
+    </div>
+    <div class="retell-bank-label">Story Events — drag to the slots above</div>
+    <div class="retell-bank" id="retell-bank">
+      <!-- scrambled cards injected by JS -->
+    </div>
+  </div>
+  <div class="retell-feedback" id="retell-feedback" style="display:none"></div>
+  <button class="btn-action" id="retell-check-btn" style="width:100%;margin-top:1rem;display:none" onclick="checkRetell()">CHECK MY ORDER ✓</button>
+  <button class="btn-action" id="retell-finish-btn" style="width:100%;margin-top:0.5rem;display:none;background:var(--green);color:#000" onclick="finishMission()">MISSION DEBRIEF →</button>
 </div>
 
 <!-- ═══ DEBRIEF ═══ -->
@@ -590,17 +715,49 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="debrief-card" id="debrief-content"></div>
   <button class="btn-csv" onclick="downloadCSV()">📊 Download Pilot Log CSV</button>
   <button class="btn-next-mission" id="btn-next-mission" onclick="goNextMission()">NEXT MISSION →</button>
-  <button class="btn-back-map" onclick="showScreen('screen-map')">← RETURN TO CAMPAIGN MAP</button>
+  <button class="btn-back-map" onclick="renderMap();showScreen('screen-map')">← RETURN TO CAMPAIGN MAP</button>
 </div>
 
 <!-- ═══ PILOT LOG ═══ -->
 <div id="screen-log" class="screen">
   <div class="stage-header">
-    <button class="back-btn" onclick="showScreen('screen-map')">← MAP</button>
+    <button class="back-btn" onclick="renderMap();showScreen('screen-map')">← MAP</button>
     <div><div class="stage-title">Pilot Log</div><div class="stage-sub">Your mission history</div></div>
   </div>
   <div class="log-card" id="log-content"></div>
   <button class="btn-csv" onclick="downloadCSV()">📊 Download Progress CSV</button>
+</div>
+
+<!-- ═══ TEACHER PIN ═══ -->
+<div id="screen-teacher-pin" class="screen">
+  <div class="stage-header">
+    <button class="back-btn" onclick="renderMap();showScreen('screen-map')">← MAP</button>
+    <div><div class="stage-title">Teacher View</div><div class="stage-sub">Enter PIN to continue</div></div>
+  </div>
+  <div class="pin-card">
+    <div class="pin-icon">🔐</div>
+    <div class="pin-label">Teacher PIN</div>
+    <input type="password" id="teacher-pin-input" class="pin-input" maxlength="6" placeholder="••••••"
+           oninput="teacherPinChanged()" onkeydown="if(event.key==='Enter')checkTeacherPin()">
+    <div class="pin-error" id="pin-error" style="display:none">Incorrect PIN. Try again.</div>
+    <button class="btn-action" style="width:100%;margin-top:1rem" onclick="checkTeacherPin()">ENTER →</button>
+    <p style="font-size:0.72rem;color:var(--muted);margin-top:1rem;text-align:center">Default PIN: <strong>1234</strong> — change it in the game source (TEACHER_PIN constant)</p>
+  </div>
+</div>
+
+<!-- ═══ TEACHER DASHBOARD ═══ -->
+<div id="screen-teacher" class="screen">
+  <div class="stage-header">
+    <button class="back-btn" onclick="renderMap();showScreen('screen-map')">← MAP</button>
+    <div><div class="stage-title">📋 Teacher Dashboard</div><div class="stage-sub" id="dash-sub">Loading student data…</div></div>
+  </div>
+  <div class="dash-toolbar">
+    <button class="dash-btn active" id="tab-all" onclick="dashTab('all')">All Students</button>
+    <button class="dash-btn" id="tab-student" onclick="dashTab('student')" style="display:none">Student Detail</button>
+    <button class="dash-btn print-btn" onclick="printReport()">🖨 Print Report</button>
+  </div>
+  <div id="dash-all-view"></div>
+  <div id="dash-student-view" style="display:none"></div>
 </div>
 
 </div><!-- /wrap -->
@@ -729,6 +886,10 @@ const WORD_DB = {
     {word:'lazy',  choices:['lazy','lazey','lazie','lazzey'], rule:'open', syllables:[{text:'la',type:'open',vowelMark:'ā'},{text:'zy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Open Engine — "la-" ends in vowel → long /ā/ · lazy'},
     {word:'navy',  choices:['navy','navey','navie','nabbey'], rule:'open', syllables:[{text:'na',type:'open',vowelMark:'ā'},{text:'vy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Open Engine — "na-" ends in vowel → long /ā/ · navy'},
     {word:'gravy', choices:['gravy','gravey','gravie','grabbey'], rule:'open', syllables:[{text:'gra',type:'open',vowelMark:'ā'},{text:'vy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Open Engine — "gra-" ends in vowel → long /ā/ · gravy'},
+    {word:'ruby',  choices:['ruby','rubey','rubie','rubbey'], rule:'open', syllables:[{text:'ru',type:'open',vowelMark:'ū'},{text:'by',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Open Engine — "ru-" ends in vowel → long /ū/ · y = long /ē/'},
+    {word:'holy',  choices:['holy','holey','holie','holley'], rule:'open', syllables:[{text:'ho',type:'open',vowelMark:'ō'},{text:'ly',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Open Engine — "ho-" ends in vowel → long /ō/ · holy'},
+    {word:'ivy',   choices:['ivy','ivey','ivie','ivvey'], rule:'open', syllables:[{text:'i',type:'open',vowelMark:'ī'},{text:'vy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Open Engine — "i-" is an open syllable → long /ī/ · y = long /ē/'},
+    {word:'tidy',  choices:['tidy','tidey','tidie','tiddey'], rule:'open', syllables:[{text:'ti',type:'open',vowelMark:'ī'},{text:'dy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Open Engine — "ti-" ends in vowel → long /ī/ · tidy'},
   ],
   '5.3-double': [
     {word:'penny',  choices:['penny','peney','penie','pennney'], rule:'double', syllables:[{text:'pen',type:'closed',vowelMark:'ĕ'},{text:'ny',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ĕ/ + single consonant → Rabbit Rule doubles "n"'},
@@ -745,6 +906,12 @@ const WORD_DB = {
     {word:'dizzy',  choices:['dizzy','dizey','dizie','dizzey'], rule:'double', syllables:[{text:'diz',type:'closed',vowelMark:'ĭ'},{text:'zy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ĭ/ + single consonant → Rabbit Rule doubles "z"'},
     {word:'jolly',  choices:['jolly','joley','jolie','jollney'], rule:'double', syllables:[{text:'jol',type:'closed',vowelMark:'ŏ'},{text:'ly',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ŏ/ + single consonant → Rabbit Rule doubles "l" · jolly'},
     {word:'hobby',  choices:['hobby','hobey','hobie','hobbey'], rule:'double', syllables:[{text:'hob',type:'closed',vowelMark:'ŏ'},{text:'by',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ŏ/ + single consonant → Rabbit Rule doubles "b" · hobby'},
+    {word:'belly',  choices:['belly','beley','belie','belley'], rule:'double', syllables:[{text:'bel',type:'closed',vowelMark:'ĕ'},{text:'ly',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ĕ/ + single consonant → Rabbit Rule doubles "l" · belly'},
+    {word:'teddy',  choices:['teddy','tedey','tedie','teddey'], rule:'double', syllables:[{text:'ted',type:'closed',vowelMark:'ĕ'},{text:'dy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ĕ/ + single consonant → Rabbit Rule doubles "d" · teddy'},
+    {word:'nanny',  choices:['nanny','naney','nanie','nanney'], rule:'double', syllables:[{text:'nan',type:'closed',vowelMark:'ă'},{text:'ny',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ă/ + single consonant → Rabbit Rule doubles "n" · nanny'},
+    {word:'taffy',  choices:['taffy','tafey','tafie','taffey'], rule:'double', syllables:[{text:'taf',type:'closed',vowelMark:'ă'},{text:'fy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ă/ + single consonant → Rabbit Rule doubles "f" · taffy'},
+    {word:'guppy',  choices:['guppy','gupey','gupie','guppey'], rule:'double', syllables:[{text:'gup',type:'closed',vowelMark:'ŭ'},{text:'py',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ŭ/ + single consonant → Rabbit Rule doubles "p" · guppy'},
+    {word:'putty',  choices:['putty','putey','puttey','puty'], rule:'double', syllables:[{text:'put',type:'closed',vowelMark:'ŭ'},{text:'ty',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short /ŭ/ + single consonant → Rabbit Rule doubles "t" · putty'},
   ],
   '5.4-mixed': [
     {word:'monkey', choices:['monkey','monky','monkie','munkee'], rule:'open', syllables:[{text:'mon',type:'closed',vowelMark:'ŏ'},{text:'key',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Exception: "monkey" uses -ey (not -y) · high-frequency word'},
@@ -769,6 +936,8 @@ const WORD_DB = {
     {word:'rusty',  choices:['rusty','rustey','rustie','russty'], rule:'double', syllables:[{text:'rust',type:'closed',vowelMark:'ŭ'},{text:'y',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Closed first syllable — consonant cluster "st" — y = long /ē/'},
     {word:'clumsy', choices:['clumsy','clumsey','clumsie','clummsy'], rule:'double', syllables:[{text:'clum',type:'closed',vowelMark:'ŭ'},{text:'sy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Closed first syllable — consonant cluster "lm" — y = long /ē/ · clumsy'},
     {word:'pansy',  choices:['pansy','pansey','pansie','pannsy'], rule:'double', syllables:[{text:'pan',type:'closed',vowelMark:'ă'},{text:'sy',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Closed first syllable — consonant cluster "ns" — y = long /ē/ · pansy'},
+    {word:'entry',  choices:['entry','entrey','entrie','entrry'], rule:'double', syllables:[{text:'en',type:'closed',vowelMark:'ĕ'},{text:'try',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Closed first syllable — consonant cluster "ntr" — y = long /ē/ · entry'},
+    {word:'plenty', choices:['plenty','plentey','plentie','plenntey'], rule:'double', syllables:[{text:'plen',type:'closed',vowelMark:'ĕ'},{text:'ty',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Closed first syllable — consonant cluster "nt" — y = long /ē/ · plenty'},
   ],
   '5.5-rr': [
     {word:'worry',  choices:['worry','wory','worrey','worrie'], rule:'double', syllables:[{text:'wor',type:'closed',vowelMark:'ŭ'},{text:'ry',type:'open',vowelMark:'ē',ySound:'/ē/'}], feedback:'Double Shield — short vowel + single r → Rabbit Rule doubles "r" · worry'},
@@ -892,7 +1061,13 @@ const READINGS = [
     questions: [
       {q:'What is the name of the pony in this story?', options:['Holly','Sally','Benny','Billy'], answer:2},
       {q:'At first, how does Sally act when she sees the pony?', options:['She jumps right on','She acts shy and hides behind her dad','She pets the pony at once','She asks to go home'], answer:1},
-      {q:'Which word from the story ends with the -y pattern meaning /ē/?', options:['wide','safe','happy','ranch'], answer:2},
+      {q:'Which word from the story uses the -y pattern that sounds like /ē/?', options:['wide','safe','happy','ranch'], answer:2},
+    ],
+    retell: [
+      "Sally's dad asks if they should go on a pony ride today.",
+      "The family drives to Mrs. Holly's ranch.",
+      "Sally is shy at first but learns it is safe to be near Benny.",
+      "Sally gets on the pony and thanks Mrs. Holly before leaving.",
     ]
   },
   // Mission 2 — Step 5.3 · "Libby Makes Grape Jelly"
@@ -906,6 +1081,12 @@ const READINGS = [
       {q:'What do Granny and Libby make together?', options:['Ruby red taffy','Grape jelly','Plum jam','Holly tea'], answer:1},
       {q:'Which word from the story uses the Rabbit Rule (double "ll")?', options:['cozy','pretty','jelly','tiny'], answer:2},
       {q:'What does Libby plan to do with the jelly she makes?', options:['Sell it at a stand','Eat it all herself','Take a bunch home for her mom and dad','Give it to Mrs. Holly'], answer:2},
+    ],
+    retell: [
+      "Libby visits Granny at her cozy log cabin.",
+      "Granny puts grapes, sugar, and water in a pot on the stove.",
+      "Libby removes the grape chunks and pours the thick jelly into crocks.",
+      "Granny and Libby taste the jelly on muffins and bagels.",
     ]
   },
   // Mission 3 — Step 5.3 · "The Jolly Menu"
@@ -918,6 +1099,12 @@ const READINGS = [
       {q:'Why couldn\'t Jimmy make the chicken he had planned?', options:['He forgot to buy it','It was still frozen','Meg ate it already','He burned it'], answer:1},
       {q:'Which word from the story uses the -ey ending instead of -y?', options:['funny','gravy','jelly','pretty'], answer:2},
       {q:'How did Meg react to the meal Jimmy made?', options:['She was very upset','She made jokes and tried to console him','She refused to eat it','She cooked something else'], answer:1},
+    ],
+    retell: [
+      "Jimmy drives home planning to cook the chicken he bought.",
+      "Jimmy finds the chicken is still frozen and has to rethink his plan.",
+      "Jimmy makes duck with jelly gravy and a kale and fennel salad.",
+      "Meg comes home and makes jokes with Jimmy over the lumpy meal.",
     ]
   },
   // Mission 4 — Step 5.4 · "Abby's Brave Day"
@@ -931,6 +1118,12 @@ const READINGS = [
       {q:'What is Abby\'s job in this story?', options:['She is a homeowner','She is part of a fire unit','She is a vet','She is a police officer'], answer:1},
       {q:'What does Abby find under the deck of the sixth house?', options:['A family hiding','A mother cat and five kittens','A lost child','A small dog'], answer:1},
       {q:'Which word from the story fits the pattern: closed first syllable + consonant cluster + -y?', options:['Abby','mother','dusty','kittens'], answer:2},
+    ],
+    retell: [
+      "Families are told to leave their homes because of a wildfire.",
+      "Abby and her fire unit check each home on the block.",
+      "Abby hears a cry under a deck and finds a mother cat with five kittens.",
+      "Abby puts the cats in her bag and carries them safely to the firetruck.",
     ]
   },
   // Mission 5 — Step 5.5 · "Mojo, the Dog Who Digs"
@@ -943,22 +1136,29 @@ const READINGS = [
       {q:'What habit did Mojo have that upset Logan?', options:['Barking all night','Digging holes all over the land','Chasing the pines','Running away'], answer:1},
       {q:'What was Logan\'s clever plan?', options:['To sell Mojo','To use the holes Mojo dug to plant pine trees','To fill in all the holes','To move to a new home'], answer:1},
       {q:'Which Step 5.5 high-frequency word appears in this story?', options:['thought','family','woman','heart'], answer:1},
+    ],
+    retell: [
+      "Logan comes home every day to find holes all over his land.",
+      "Logan thinks of a plan to use Mojo's holes for something helpful.",
+      "Logan plants pine trees in the holes Mojo dug.",
+      "Logan's land becomes more beautiful and he is glad to have Mojo.",
     ]
   },
 ];
 
 // ── TAP WARM-UP WORDS (per mission) — authentic WRS Step 5 words ──
+// Words with ySound:'long-i' get a special /ī/ badge in the tap display
 const TAP_WORDS = [
-  // M1 · 5.3 open syllable -y intro
-  [{word:'baby',count:2},{word:'tiny',count:2},{word:'pony',count:2},{word:'lazy',count:2},{word:'navy',count:2},{word:'gravy',count:2}],
-  // M2 · 5.3 double consonant -y
-  [{word:'penny',count:2},{word:'silly',count:2},{word:'puppy',count:2},{word:'kitty',count:2},{word:'funny',count:2},{word:'muddy',count:2}],
-  // M3 · 5.4 -ey vs -y mixed
-  [{word:'monkey',count:2},{word:'turkey',count:2},{word:'valley',count:2},{word:'honey',count:2},{word:'rocky',count:2},{word:'lucky',count:2}],
-  // M4 · 5.4 consonant clusters + -y
-  [{word:'candy',count:2},{word:'empty',count:2},{word:'fancy',count:2},{word:'handy',count:2},{word:'windy',count:2},{word:'bumpy',count:2}],
-  // M5 · 5.5 rr-doubling + mixed mastery
-  [{word:'worry',count:2},{word:'hurry',count:2},{word:'carry',count:2},{word:'sorry',count:2},{word:'family',count:3},{word:'early',count:2}],
+  // M1 · 5.3 open syllable -y intro — review 1-syl /i/ y words + 2-syl targets
+  [{word:'cry',count:1,ySound:'long-i'},{word:'fly',count:1,ySound:'long-i'},{word:'dry',count:1,ySound:'long-i'},{word:'baby',count:2},{word:'tiny',count:2},{word:'pony',count:2},{word:'navy',count:2},{word:'gravy',count:2}],
+  // M2 · 5.3 double consonant -y — review 1-syl /i/ y words + 2-syl targets
+  [{word:'spy',count:1,ySound:'long-i'},{word:'try',count:1,ySound:'long-i'},{word:'sky',count:1,ySound:'long-i'},{word:'penny',count:2},{word:'silly',count:2},{word:'puppy',count:2},{word:'kitty',count:2},{word:'funny',count:2}],
+  // M3 · 5.4 -ey vs -y mixed — review 1-syl /i/ y words + 2-syl targets
+  [{word:'by',count:1,ySound:'long-i'},{word:'my',count:1,ySound:'long-i'},{word:'fry',count:1,ySound:'long-i'},{word:'monkey',count:2},{word:'turkey',count:2},{word:'valley',count:2},{word:'honey',count:2},{word:'rocky',count:2}],
+  // M4 · 5.4 consonant clusters + -y — review 1-syl /i/ y words + 2-syl targets
+  [{word:'why',count:1,ySound:'long-i'},{word:'sly',count:1,ySound:'long-i'},{word:'pry',count:1,ySound:'long-i'},{word:'candy',count:2},{word:'empty',count:2},{word:'fancy',count:2},{word:'handy',count:2},{word:'windy',count:2}],
+  // M5 · 5.5 rr-doubling + mixed mastery — review 1-syl /i/ y words + 2-syl targets
+  [{word:'fly',count:1,ySound:'long-i'},{word:'cry',count:1,ySound:'long-i'},{word:'try',count:1,ySound:'long-i'},{word:'worry',count:2},{word:'hurry',count:2},{word:'carry',count:2},{word:'sorry',count:2},{word:'family',count:3}],
 ];
 
 // ── SORT WORDS (per mission) — authentic WRS open vs double pairs ──
@@ -975,28 +1175,49 @@ const SORT_SETS = [
   [{word:'worry',type:'double'},{word:'honey',type:'open'},{word:'sorry',type:'double'},{word:'pony',type:'open'},{word:'hurry',type:'double'},{word:'turkey',type:'open'}],
 ];
 
-// ── SPELL DECKS (per mission, 10 words) — from WRS 5.3–5.5 word lists ──
-const SPELL_DECKS = [
-  // M1: 5.3 open syllable -y intro — from WRS 5.3 AB syllable division list
-  ['baby','pony','penny','puppy','tiny','funny','lady','jelly','cozy','silly'],
-  // M2: 5.3 double consonant focus — from WRS 5.3 A/B double consonants list
-  ['kitty','muddy','nutty','foggy','dizzy','bunny','happy','jolly','hobby','dizzy'],
-  // M3: 5.4 -ey vs -y — from WRS 5.4 mixed + 5.3 double
-  ['monkey','turkey','rocky','lucky','valley','sticky','honey','money','foggy','dizzy'],
-  // M4: 5.4 consonant clusters — from WRS 5.3 B syllable division list
-  ['candy','empty','fancy','handy','windy','bumpy','dusty','rusty','clumsy','pansy'],
+// ── WORD BANKS (large pools per mission — 12 drawn randomly each play) ──
+const WORD_BANKS = [
+  // M1: 5.3 open syllable -y — all Open Engine words
+  ['baby','pony','lady','tiny','cozy','gravy','ruby','holy','ivy','tidy','navy','lazy','cozy','lady'],
+  // M2: 5.3 double consonant -y — all Rabbit Rule
+  ['kitty','muddy','nutty','foggy','dizzy','bunny','happy','jolly','belly','teddy','nanny','taffy','guppy','putty','penny','silly','puppy','funny','jelly','hobby'],
+  // M3: 5.4 -ey vs -y — exceptions mixed with doubles
+  ['monkey','turkey','valley','honey','money','rocky','lucky','sticky','foggy','dizzy','jolly','kitty','puppy','funny','jelly','bunny'],
+  // M4: 5.4 consonant clusters
+  ['candy','empty','fancy','handy','windy','bumpy','dusty','rusty','clumsy','pansy','entry','plenty','dandy','sandy','lumpy','musty'],
   // M5: 5.5 rr-doubling + mixed mastery
-  ['worry','hurry','carry','sorry','merry','berry','honey','lucky','foggy','candy'],
+  ['worry','hurry','carry','sorry','merry','berry','cherry','ferry','honey','lucky','foggy','candy','bumpy','silly','puppy','monkey'],
 ];
 
-// Build spell word objects from deck list
+// Draw N unique words randomly from a bank
+function drawFromBank(bankIdx, n=12){
+  const bank = [...new Set(WORD_BANKS[bankIdx])]; // deduplicate
+  const shuffled = shuffle(bank);
+  return shuffled.slice(0, Math.min(n, shuffled.length));
+}
+
+// ── SPELL DECKS — built fresh each mission start via drawFromBank ──
+// (kept as fallback reference for badge score display)
+const SPELL_DECKS = WORD_BANKS.map(b => [...new Set(b)].slice(0,12));
+
+// Build spell word objects — draws fresh random 12 from bank each play
 function buildSpellDeck(missionIdx) {
-  const wordList = SPELL_DECKS[missionIdx];
+  const wordList = drawFromBank(missionIdx, 12);
   const all = Object.values(WORD_DB).flat();
   const result = [];
   for (const wName of wordList) {
     const found = all.find(w => w.word === wName);
     if (found) result.push({...found});
+  }
+  // Fallback: if bank words aren't all in WORD_DB, fill from SPELL_DECKS
+  if (result.length < 8) {
+    const fallback = SPELL_DECKS[missionIdx];
+    for (const wName of fallback) {
+      if (result.find(w=>w.word===wName)) continue;
+      const found = all.find(w => w.word === wName);
+      if (found) result.push({...found});
+      if (result.length >= 12) break;
+    }
   }
   return result;
 }
@@ -1224,16 +1445,27 @@ function renderTapWord(){
   if(G.tapIdx >= G.tapWords.length){ completeTapWarmup(); return; }
   const tw = G.tapWords[G.tapIdx];
   G.tapTapCount = 0; G.tapAnswered = false;
-  document.getElementById('tap-word').textContent = tw.word.toUpperCase();
-  document.getElementById('tap-word').className = 'tap-word';
+  const isLongI = tw.ySound === 'long-i';
+  // Word display with badge
+  const wordEl = document.getElementById('tap-word');
+  wordEl.className = 'tap-word' + (isLongI ? ' tap-word-longi' : '');
+  wordEl.textContent = tw.word.toUpperCase();
+  // Badge next to word
+  let badgeEl = document.getElementById('tap-yi-badge');
+  if (!badgeEl) {
+    badgeEl = document.createElement('div');
+    badgeEl.id = 'tap-yi-badge';
+    badgeEl.style.cssText = 'font-family:Orbitron,monospace;font-size:0.7rem;color:var(--amber);margin-top:0.3rem;min-height:1.2rem;text-align:center;';
+    wordEl.parentNode.insertBefore(badgeEl, wordEl.nextSibling);
+  }
+  badgeEl.textContent = isLongI ? 'y = /ī/ here (single syllable!)' : '';
   document.getElementById('tap-count').textContent = 'Tap to count syllables';
-  document.getElementById('tap-hint').textContent = 'Tap the word, then choose below';
+  document.getElementById('tap-hint').textContent = isLongI ? 'Single syllable — y sounds like /ī/ in this word' : 'Tap the word, then choose below';
   document.getElementById('tap-prog-text').textContent = `Word ${G.tapIdx+1} of ${G.tapWords.length}`;
   document.getElementById('tap-score-text').textContent = `${G.tapCorrect} correct`;
   document.getElementById('tap-feedback').textContent = 'Tap the word to feel the syllables, then choose.';
   document.getElementById('tap-feedback').className = 'tap-feedback tap-fb-neutral';
   document.getElementById('tap-next-btn').style.display = 'none';
-  // Build options: 1, 2, 3, 4
   const opts = document.getElementById('tap-options');
   opts.innerHTML = [1,2,3,4].map(n=>`<button class="tap-opt" onclick="pickTap(this,${n})">${n}</button>`).join('');
 }
@@ -1241,26 +1473,31 @@ function animateTap(){
   if(G.tapAnswered) return;
   G.tapTapCount++;
   const tw = document.getElementById('tap-word');
-  tw.className = 'tap-word tapped';
-  setTimeout(()=>tw.className='tap-word',120);
+  tw.className = (tw.className.includes('longi') ? 'tap-word tap-word-longi' : 'tap-word') + ' tapped';
+  setTimeout(()=>tw.className=tw.className.replace(' tapped',''),120);
   document.getElementById('tap-count').textContent = `${G.tapTapCount} tap${G.tapTapCount!==1?'s':''}`;
 }
 function pickTap(btn, n){
   if(G.tapAnswered) return;
   G.tapAnswered = true;
   const tw = G.tapWords[G.tapIdx];
+  const isLongI = tw.ySound === 'long-i';
   document.querySelectorAll('.tap-opt').forEach(b=>b.disabled=true);
   const fb = document.getElementById('tap-feedback');
   const isCorrect = n===tw.count;
   if(isCorrect){
     btn.classList.add('correct');
     if(G.tapPhase===1) G.tapCorrect++; else G.tapP2Correct++;
-    fb.textContent = `✓ Correct! "${tw.word}" has ${tw.count} syllable${tw.count>1?'s':''}.`;
+    fb.textContent = isLongI
+      ? `✓ Correct! "${tw.word}" is 1 syllable — y = /ī/ (not /ē/) because the word has only one syllable.`
+      : `✓ Correct! "${tw.word}" has ${tw.count} syllable${tw.count>1?'s':''}.`;
     fb.className = 'tap-feedback tap-fb-correct';
   } else {
     btn.classList.add('wrong');
     document.querySelectorAll('.tap-opt').forEach(b=>{ if(parseInt(b.textContent)===tw.count) b.classList.add('correct'); });
-    fb.textContent = `"${tw.word}" has ${tw.count} syllable${tw.count>1?'s':''}. Keep tapping to feel the rhythm!`;
+    fb.textContent = isLongI
+      ? `"${tw.word}" has just ${tw.count} syllable — y = /ī/ in single-syllable words!`
+      : `"${tw.word}" has ${tw.count} syllable${tw.count>1?'s':''}. Keep tapping to feel the rhythm!`;
     fb.className = 'tap-feedback tap-fb-wrong';
   }
   document.getElementById('tap-score-text').textContent = `${G.tapPhase===1?G.tapCorrect:G.tapP2Correct} correct`;
@@ -1359,6 +1596,7 @@ function checkSort(){
 function initSpell(mIdx){
   G.spellDeck = buildSpellDeck(mIdx);
   G.spellIdx = 0; G.spellMyScore = 0; G.spellP2Score = 0; G.spellAriaScore = 0; G.spellAnswered = false;
+  G.spellMissed = [];
   G.activePlayer = 1;
   const m = MISSIONS[mIdx];
   const is2P = G.mode!=='solo';
@@ -1429,7 +1667,12 @@ function pickSpell(btn,choice,answer){
     fb.className='feedback wrong-fb';
     document.getElementById('spell-next-btn').style.display='none';
     showRepairPanel(item);
-    if(!item.isReentry){ const clone={...item,isReentry:true}; const at=Math.min(G.spellIdx+2+Math.floor(Math.random()*2),G.spellDeck.length); G.spellDeck.splice(at,0,clone); }
+    if(!item.isReentry){
+      // Track missed word for Firebase report
+      if(!G.spellMissed) G.spellMissed = [];
+      if(!G.spellMissed.includes(item.word)) G.spellMissed.push(item.word);
+      const clone={...item,isReentry:true}; const at=Math.min(G.spellIdx+2+Math.floor(Math.random()*2),G.spellDeck.length); G.spellDeck.splice(at,0,clone);
+    }
   }
 }
 function showRepairPanel(item){
@@ -1536,21 +1779,256 @@ function pickComp(btn,idx,answer){
   }
   setTimeout(()=>{ G.readIdx++; renderCompQuestion(); }, 1200);
 }
+// ── RETELL STAGE ──
+function startRetell(){
+  const mIdx = G.currentMission;
+  const r = READINGS[mIdx];
+  const m = MISSIONS[mIdx];
+  document.getElementById('retell-mission-title').textContent = `Mission ${m.id} · ${m.title}`;
+  document.getElementById('retell-sub').textContent = `Story Retell · ${r.title}`;
+  document.getElementById('retell-feedback').style.display = 'none';
+  document.getElementById('retell-check-btn').style.display = 'none';
+  document.getElementById('retell-finish-btn').style.display = 'none';
+  G.retellOrder = r.retell; // correct order
+  G.retellScore = 0;
+
+  // Scramble events
+  const scrambled = shuffle([...r.retell]);
+
+  // Build slots
+  const labels = [
+    {word:'FIRST', cls:'first'},
+    {word:'NEXT',  cls:'next'},
+    {word:'THEN',  cls:'then'},
+    {word:'LAST',  cls:'last'},
+  ];
+  const slotsEl = document.getElementById('retell-slots');
+  slotsEl.innerHTML = labels.map((lbl,i)=>`
+    <div class="retell-slot" id="retell-slot-${i}"
+         ondragover="retellDragOver(event,${i})"
+         ondragleave="retellDragLeave(event,${i})"
+         ondrop="retellDrop(event,${i})">
+      <div class="retell-slot-label ${lbl.cls}">${lbl.word}</div>
+      <div class="retell-slot-content" id="retell-slot-text-${i}"></div>
+    </div>`).join('');
+
+  // Build draggable bank cards
+  const bankEl = document.getElementById('retell-bank');
+  bankEl.innerHTML = scrambled.map((evt,i)=>`
+    <div class="retell-card" id="retell-card-${i}"
+         draggable="true"
+         data-event="${encodeURIComponent(evt)}"
+         ondragstart="retellDragStart(event,'retell-card-${i}')">
+      ${evt}
+    </div>`).join('');
+
+  // Touch support
+  initRetellTouch();
+  showScreen('screen-retell');
+}
+
+let _dragCardId = null;
+let _dragFromSlot = null; // null = from bank, or slot index
+
+function retellDragStart(e, cardId){
+  _dragCardId = cardId;
+  _dragFromSlot = e.target.closest('.retell-slot') ? _slotOfCard(cardId) : null;
+  e.target.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+function _slotOfCard(cardId){
+  for(let i=0;i<4;i++){
+    const sc = document.getElementById(`retell-slot-text-${i}`);
+    if(sc && sc.dataset.cardId === cardId) return i;
+  }
+  return null;
+}
+function retellDragOver(e, slotIdx){
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  document.getElementById(`retell-slot-${slotIdx}`).classList.add('drag-over');
+}
+function retellDragLeave(e, slotIdx){
+  document.getElementById(`retell-slot-${slotIdx}`).classList.remove('drag-over');
+}
+function retellDrop(e, slotIdx){
+  e.preventDefault();
+  const slotEl = document.getElementById(`retell-slot-${slotIdx}`);
+  slotEl.classList.remove('drag-over');
+  if(!_dragCardId) return;
+
+  const card = document.getElementById(_dragCardId);
+  if(!card) return;
+  card.classList.remove('dragging');
+
+  const slotTextEl = document.getElementById(`retell-slot-text-${slotIdx}`);
+  const existingCardId = slotTextEl.dataset.cardId;
+
+  // If slot already occupied, send displaced card back to bank (or swap)
+  if(existingCardId && existingCardId !== _dragCardId){
+    const displaced = document.getElementById(existingCardId);
+    if(_dragFromSlot !== null){
+      // Swap: put displaced into the source slot
+      const srcText = document.getElementById(`retell-slot-text-${_dragFromSlot}`);
+      srcText.textContent = displaced ? displaced.dataset.event ? decodeURIComponent(displaced.dataset.event) : displaced.textContent : '';
+      if(displaced){ srcText.dataset.cardId = existingCardId; displaced.style.display='none'; }
+      document.getElementById(`retell-slot-${_dragFromSlot}`).classList.add('filled');
+    } else {
+      // From bank → return displaced to bank
+      if(displaced){ displaced.style.display='flex'; }
+      document.getElementById(`retell-slot-${slotIdx}`).classList.remove('filled');
+    }
+  } else if(!existingCardId && _dragFromSlot !== null){
+    // Moving out of a source slot → clear it
+    const srcText = document.getElementById(`retell-slot-text-${_dragFromSlot}`);
+    srcText.textContent = '';
+    delete srcText.dataset.cardId;
+    document.getElementById(`retell-slot-${_dragFromSlot}`).classList.remove('filled');
+  }
+
+  // Place card into target slot
+  const evtText = decodeURIComponent(card.dataset.event);
+  slotTextEl.textContent = evtText;
+  slotTextEl.dataset.cardId = _dragCardId;
+  card.style.display = 'none';
+  slotEl.classList.add('filled');
+
+  _dragCardId = null;
+  _dragFromSlot = null;
+  updateRetellCheckBtn();
+}
+
+// Allow dragging from a filled slot back to bank
+function initRetellBankDrop(){
+  const bank = document.getElementById('retell-bank');
+  bank.ondragover = e=>{ e.preventDefault(); e.dataTransfer.dropEffect='move'; bank.style.borderColor='var(--purple)'; };
+  bank.ondragleave = ()=>{ bank.style.borderColor=''; };
+  bank.ondrop = e=>{
+    e.preventDefault(); bank.style.borderColor='';
+    if(!_dragCardId) return;
+    const card = document.getElementById(_dragCardId);
+    if(!card) return;
+    card.classList.remove('dragging');
+    // Clear source slot if dragging from slot
+    if(_dragFromSlot !== null){
+      const srcText = document.getElementById(`retell-slot-text-${_dragFromSlot}`);
+      srcText.textContent = ''; delete srcText.dataset.cardId;
+      document.getElementById(`retell-slot-${_dragFromSlot}`).classList.remove('filled');
+    }
+    card.style.display = 'flex';
+    _dragCardId = null; _dragFromSlot = null;
+    updateRetellCheckBtn();
+  };
+}
+
+function updateRetellCheckBtn(){
+  // Show check button once all 4 slots are filled
+  const allFilled = [0,1,2,3].every(i=>{
+    const t = document.getElementById(`retell-slot-text-${i}`);
+    return t && t.textContent.trim().length > 0;
+  });
+  document.getElementById('retell-check-btn').style.display = allFilled ? 'block' : 'none';
+}
+
+// Touch drag-and-drop fallback for mobile
+function initRetellTouch(){
+  initRetellBankDrop();
+  // Simple touch: tap card to select, tap slot to place
+  let _touchSelected = null;
+  document.querySelectorAll('.retell-card').forEach(card=>{
+    card.addEventListener('touchend', e=>{
+      e.preventDefault();
+      if(_touchSelected === card){
+        card.classList.remove('touch-selected'); _touchSelected = null; return;
+      }
+      if(_touchSelected) _touchSelected.classList.remove('touch-selected');
+      _touchSelected = card; card.classList.add('touch-selected');
+    });
+  });
+  document.querySelectorAll('.retell-slot').forEach((slot,i)=>{
+    slot.addEventListener('touchend', e=>{
+      e.preventDefault();
+      if(!_touchSelected) return;
+      // Simulate drop
+      _dragCardId = _touchSelected.id;
+      _dragFromSlot = _slotOfCard(_dragCardId);
+      retellDrop({preventDefault:()=>{}}, i);
+      _touchSelected.classList.remove('touch-selected');
+      _touchSelected = null;
+    });
+  });
+  // Touch: tap bank to return selected card
+  document.getElementById('retell-bank').addEventListener('touchend', e=>{
+    if(!_touchSelected) return;
+    e.preventDefault();
+    _dragCardId = _touchSelected.id;
+    _dragFromSlot = _slotOfCard(_dragCardId);
+    if(_dragFromSlot !== null){
+      const srcText = document.getElementById(`retell-slot-text-${_dragFromSlot}`);
+      srcText.textContent = ''; delete srcText.dataset.cardId;
+      document.getElementById(`retell-slot-${_dragFromSlot}`).classList.remove('filled');
+    }
+    _touchSelected.style.display = 'flex';
+    _touchSelected.classList.remove('touch-selected');
+    _touchSelected = null; _dragCardId = null; _dragFromSlot = null;
+    updateRetellCheckBtn();
+  });
+}
+
+function checkRetell(){
+  const correct = G.retellOrder;
+  let score = 0;
+  const results = correct.map((evt, i)=>{
+    const slotText = document.getElementById(`retell-slot-text-${i}`).textContent.trim();
+    const isRight = slotText === evt;
+    if(isRight) score++;
+    document.getElementById(`retell-slot-${i}`).classList.add(isRight ? 'correct-slot' : 'wrong-slot');
+    return isRight;
+  });
+
+  G.retellScore = score;
+  // Add to reading score
+  G.readCorrect = (G.readCorrect||0) + score;
+
+  const fb = document.getElementById('retell-feedback');
+  fb.style.display = 'block';
+  const labels = ['First','Next','Then','Last'];
+  const wrongItems = results.map((r,i)=>r?null:`<li><strong>${labels[i]}:</strong> ${correct[i]}</li>`).filter(Boolean);
+
+  if(score === 4){
+    fb.className = 'retell-feedback rf-correct';
+    fb.innerHTML = `🌕 Perfect retell! All 4 events in the right order. +${score} points`;
+  } else if(score >= 2){
+    fb.className = 'retell-feedback rf-partial';
+    fb.innerHTML = `🚀 Good effort — ${score}/4 correct. The correct order was:<ul style="margin:0.5rem 0 0;padding-left:1.2rem">${wrongItems.join('')}</ul>`;
+  } else {
+    fb.className = 'retell-feedback rf-wrong';
+    fb.innerHTML = `📡 Keep training — ${score}/4 correct. The correct order was:<ul style="margin:0.5rem 0 0;padding-left:1.2rem">${correct.map((e,i)=>`<li><strong>${labels[i]}:</strong> ${e}</li>`).join('')}</ul>`;
+  }
+
+  document.getElementById('retell-check-btn').style.display = 'none';
+  document.getElementById('retell-finish-btn').style.display = 'block';
+}
+
 function finishMission(){
   const mIdx = G.currentMission;
-  const spellTotal = SPELL_DECKS[mIdx].length;
+  const spellTotal = G.spellDeck ? G.spellDeck.length : SPELL_DECKS[mIdx].length;
   const ariaScore = G.ariaOn ? ariaAnswers(mIdx) : 0;
   const passed = G.spellMyScore >= spellTotal * 0.7;
+  const retellScore = G.retellScore || 0;
+  const mcReadScore = Math.max(0, (G.readCorrect||0) - retellScore);
   G.missionScores[mIdx] = {
     spellScore: Math.round(G.spellMyScore),
     p2SpellScore: Math.round(G.spellP2Score),
     spellTotal,
-    sortScore: G.sortWords.length,
+    sortScore: G.sortWords ? G.sortWords.length : 0,
     tapScore: G.tapCorrect,
     tapP2Score: G.tapP2Correct,
-    readScore: G.readCorrect,
+    readScore: mcReadScore,
     readP2Score: G.readP2Correct,
-    readTotal: G.readQs.length,
+    readTotal: G.readQs ? G.readQs.length : 3,
+    retellScore,
+    retellTotal: 4,
     ariaScore,
     passed,
     date: new Date().toLocaleDateString(),
@@ -1587,7 +2065,8 @@ function showDebrief(mIdx){
       <div class="ds-tile"><div class="ds-val" style="color:var(--cyan)">${sc.spellScore}/${sc.spellTotal}</div><div class="ds-lbl">${G.playerName}<br>Spelling</div></div>
       ${is2P?`<div class="ds-tile"><div class="ds-val" style="color:var(--p2)">${sc.p2SpellScore}/${sc.spellTotal}</div><div class="ds-lbl">${G.p2Name}<br>Spelling</div></div>`:''}
       <div class="ds-tile"><div class="ds-val" style="color:var(--green)">${sc.tapScore}/${G.tapWords?G.tapWords.length:6}</div><div class="ds-lbl">Tap<br>Warm-Up</div></div>
-      <div class="ds-tile"><div class="ds-val" style="color:var(--amber)">${sc.readScore}/${sc.readTotal}</div><div class="ds-lbl">Reading</div></div>
+      <div class="ds-tile"><div class="ds-val" style="color:var(--amber)">${sc.readScore}/${sc.readTotal}</div><div class="ds-lbl">Reading<br>Q&amp;A</div></div>
+      <div class="ds-tile"><div class="ds-val" style="color:var(--purple)">${sc.retellScore||0}/4</div><div class="ds-lbl">Story<br>Retell</div></div>
     </div>
     <div class="vs-result">
       ${vsRows}
@@ -1647,6 +2126,255 @@ function downloadCSV(){
   a.href=url; a.download=`nebula-y-${G.playerName.replace(/\s+/g,'-')}-progress.csv`; a.click();
   URL.revokeObjectURL(url);
 }
+// ════════════════════════════════════════════════
+// FIREBASE — AUTO-SAVE & TEACHER DASHBOARD
+// ════════════════════════════════════════════════
+
+const TEACHER_PIN = '1234'; // ← Change this to your own PIN
+
+// ── Save a completed mission to Firestore ──
+async function fbSaveMission(mIdx){
+  if(!window._fbReady){ console.warn('Firebase not ready — session not saved'); return; }
+  const { db, collection, addDoc, doc, setDoc, getDoc, serverTimestamp } = window._fb;
+  const sc  = G.missionScores[mIdx];
+  const m   = MISSIONS[mIdx];
+  if(!sc) return;
+
+  const sessionData = {
+    studentName:   G.playerName,
+    token:         G.token,
+    mode:          G.mode,
+    missionId:     m.id,
+    missionTitle:  m.title,
+    step:          m.step,
+    date:          sc.date || new Date().toLocaleDateString(),
+    timestamp:     serverTimestamp(),
+    spellScore:    sc.spellScore,
+    spellTotal:    sc.spellTotal,
+    spellPercent:  Math.round(sc.spellScore / sc.spellTotal * 100),
+    tapScore:      sc.tapScore,
+    readScore:     sc.readScore,
+    readTotal:     sc.readTotal,
+    retellScore:   sc.retellScore || 0,
+    retellTotal:   4,
+    missedWords:   G.spellMissed || [],
+    passed:        sc.passed,
+    p2Name:        G.mode !== 'solo' ? G.p2Name : null,
+    p2SpellScore:  G.mode !== 'solo' ? sc.p2SpellScore : null,
+    ariaScore:     G.ariaOn ? sc.ariaScore : null,
+  };
+
+  try {
+    // 1. Add to sessions collection
+    await addDoc(collection(db, 'sessions'), sessionData);
+
+    // 2. Upsert student summary document
+    const studentRef  = doc(db, 'students', G.playerName.toLowerCase().replace(/\s+/g,'_'));
+    const studentSnap = await getDoc(studentRef);
+    const existing    = studentSnap.exists() ? studentSnap.data() : { missions: {}, totalSessions: 0 };
+    existing.name           = G.playerName;
+    existing.token          = G.token;
+    existing.lastSeen       = new Date().toLocaleDateString();
+    existing.totalSessions  = (existing.totalSessions || 0) + 1;
+    existing.missions       = existing.missions || {};
+    existing.missions[mIdx] = {
+      completed:    true,
+      bestSpell:    Math.max(existing.missions[mIdx]?.bestSpell || 0, sc.spellScore),
+      bestRetell:   Math.max(existing.missions[mIdx]?.bestRetell || 0, sc.retellScore || 0),
+      lastDate:     sc.date,
+      missedWords:  G.spellMissed || [],
+    };
+    await setDoc(studentRef, existing);
+    console.log('✓ Session saved to Firebase');
+  } catch(err){
+    console.error('Firebase save error:', err);
+  }
+}
+
+// Track missed words during spell stage
+G.spellMissed = [];
+
+// ── Teacher PIN screen ──
+function showTeacherPin(){
+  document.getElementById('teacher-pin-input').value = '';
+  document.getElementById('pin-error').style.display = 'none';
+  showScreen('screen-teacher-pin');
+}
+function teacherPinChanged(){
+  document.getElementById('pin-error').style.display = 'none';
+}
+function checkTeacherPin(){
+  const entered = document.getElementById('teacher-pin-input').value;
+  if(entered === TEACHER_PIN){
+    showTeacherDashboard();
+  } else {
+    document.getElementById('pin-error').style.display = 'block';
+    document.getElementById('teacher-pin-input').value = '';
+  }
+}
+
+// ── Teacher Dashboard ──
+async function showTeacherDashboard(){
+  showScreen('screen-teacher');
+  document.getElementById('tab-student').style.display = 'none';
+  document.getElementById('dash-all-view').innerHTML =
+    '<div class="dash-fb-status fb-loading">🔄 Loading student data from Firebase…</div>';
+
+  if(!window._fbReady){
+    document.getElementById('dash-all-view').innerHTML =
+      '<div class="dash-fb-status fb-err">⚠️ Firebase not connected. Add your config keys to the firebase-module script at the top of this file.</div>';
+    document.getElementById('dash-sub').textContent = 'Firebase not configured';
+    return;
+  }
+
+  const { db, collection, getDocs, query, orderBy } = window._fb;
+  try {
+    const snap = await getDocs(collection(db, 'students'));
+    const students = [];
+    snap.forEach(d => students.push({ id: d.id, ...d.data() }));
+    students.sort((a,b) => (b.lastSeen||'').localeCompare(a.lastSeen||''));
+
+    document.getElementById('dash-sub').textContent =
+      `${students.length} student${students.length!==1?'s':''} · last updated ${new Date().toLocaleDateString()}`;
+
+    if(students.length === 0){
+      document.getElementById('dash-all-view').innerHTML =
+        '<div class="dash-empty">No student data yet.<br>Complete a mission to see records here.</div>';
+      return;
+    }
+
+    document.getElementById('dash-all-view').innerHTML = students.map(s => {
+      const pills = MISSIONS.map((m,i) => {
+        const ms = s.missions?.[i];
+        if(!ms) return `<span class="sc-mission-pill smp-todo">M${m.id}</span>`;
+        const pct = ms.bestSpell ? Math.round(ms.bestSpell / 12 * 100) : 0;
+        const cls = pct >= 80 ? 'smp-done' : 'smp-partial';
+        return `<span class="sc-mission-pill ${cls}">M${m.id} ${pct}%</span>`;
+      }).join('');
+      const done = Object.values(s.missions||{}).filter(ms=>ms.completed).length;
+      return `<div class="student-card" onclick="showStudentDetail('${s.id}')">
+        <div class="sc-header">
+          <div class="sc-avatar">${s.token||'🚀'}</div>
+          <div class="sc-name">${s.name||s.id}</div>
+          <div class="sc-date">${done}/${MISSIONS.length} missions · ${s.lastSeen||''}</div>
+        </div>
+        <div class="sc-missions">${pills}</div>
+      </div>`;
+    }).join('');
+
+  } catch(err){
+    document.getElementById('dash-all-view').innerHTML =
+      `<div class="dash-fb-status fb-err">⚠️ Firebase error: ${err.message}</div>`;
+  }
+}
+
+// ── Student detail view ──
+async function showStudentDetail(studentId){
+  document.getElementById('tab-student').style.display = 'inline-block';
+  document.getElementById('tab-all').classList.remove('active');
+  document.getElementById('tab-student').classList.add('active');
+  document.getElementById('dash-all-view').style.display = 'none';
+  const detailEl = document.getElementById('dash-student-view');
+  detailEl.style.display = 'block';
+  detailEl.innerHTML = '<div class="dash-fb-status fb-loading">🔄 Loading sessions…</div>';
+
+  const { db, collection, getDocs, query, orderBy } = window._fb;
+  try {
+    // Get all sessions for this student
+    const snap  = await getDocs(collection(db, 'sessions'));
+    const sessions = [];
+    snap.forEach(d => {
+      const data = d.data();
+      const sId  = data.studentName?.toLowerCase().replace(/\s+/g,'_');
+      if(sId === studentId) sessions.push(data);
+    });
+    sessions.sort((a,b) => (a.missionId||0)-(b.missionId||0));
+
+    // Get student doc for summary
+    const { doc, getDoc } = window._fb;
+    const studentSnap = await getDoc(doc(db, 'students', studentId));
+    const student = studentSnap.exists() ? studentSnap.data() : {};
+
+    // Group sessions by mission
+    const byMission = {};
+    sessions.forEach(s => {
+      const k = s.missionId || 0;
+      if(!byMission[k]) byMission[k] = [];
+      byMission[k].push(s);
+    });
+
+    // Build mission detail cards
+    const missionCards = MISSIONS.map((m,i) => {
+      const mSessions = byMission[m.id] || [];
+      if(mSessions.length === 0){
+        return `<div class="mission-detail-card">
+          <div class="mdc-title">Mission ${m.id} · ${m.title.split('—').pop().trim()} <span style="color:var(--muted)">Not attempted</span></div>
+        </div>`;
+      }
+      // Best session
+      const best = mSessions.reduce((a,b)=>((b.spellPercent||0)>(a.spellPercent||0)?b:a));
+      const allMissed = [...new Set(mSessions.flatMap(s=>s.missedWords||[]))];
+      const scoreColor = (pct) => pct>=90?'var(--green)':pct>=70?'var(--amber)':'var(--red)';
+      return `<div class="mission-detail-card">
+        <div class="mdc-title">
+          Mission ${m.id} · ${m.step} · ${m.title.split('—').pop().trim()}
+          <span style="color:var(--muted)">${mSessions.length} attempt${mSessions.length>1?'s':''} · ${best.date||''}</span>
+        </div>
+        <div class="mdc-scores">
+          <div class="mdc-score"><div class="mdc-val" style="color:${scoreColor(best.spellPercent||0)}">${best.spellPercent||0}%</div><div class="mdc-lbl">Spelling</div></div>
+          <div class="mdc-score"><div class="mdc-val" style="color:var(--cyan)">${best.spellScore||0}/${best.spellTotal||12}</div><div class="mdc-lbl">Spell Score</div></div>
+          <div class="mdc-score"><div class="mdc-val" style="color:var(--green)">${best.tapScore||0}</div><div class="mdc-lbl">Tap</div></div>
+          <div class="mdc-score"><div class="mdc-val" style="color:var(--amber)">${best.readScore||0}/${best.readTotal||3}</div><div class="mdc-lbl">Reading</div></div>
+          <div class="mdc-score"><div class="mdc-val" style="color:var(--purple)">${best.retellScore||0}/4</div><div class="mdc-lbl">Retell</div></div>
+          <div class="mdc-score"><div class="mdc-val" style="color:${best.passed?'var(--green)':'var(--red)'}">${best.passed?'✓':'✗'}</div><div class="mdc-lbl">Passed</div></div>
+        </div>
+        ${allMissed.length>0?`<div class="mdc-missed">
+          <div class="mdc-missed-label">Words to review (across all attempts):</div>
+          <div class="missed-words">${allMissed.map(w=>`<span class="missed-word">${w}</span>`).join('')}</div>
+        </div>`:'<div style="font-size:0.72rem;color:var(--green)">✓ No missed words on record</div>'}
+      </div>`;
+    }).join('');
+
+    detailEl.innerHTML = `
+      <div class="back-to-all" onclick="dashTab('all')">← All Students</div>
+      <div class="student-card" style="cursor:default">
+        <div class="sc-header">
+          <div class="sc-avatar">${student.token||'🚀'}</div>
+          <div class="sc-name">${student.name||studentId}</div>
+          <div class="sc-date">Last seen ${student.lastSeen||'—'} · ${student.totalSessions||1} session${(student.totalSessions||1)>1?'s':''}</div>
+        </div>
+      </div>
+      ${missionCards}`;
+
+  } catch(err){
+    detailEl.innerHTML = `<div class="dash-fb-status fb-err">⚠️ Error: ${err.message}</div>`;
+  }
+}
+
+function dashTab(tab){
+  document.getElementById('tab-all').classList.toggle('active', tab==='all');
+  document.getElementById('tab-student').classList.toggle('active', tab==='student');
+  document.getElementById('dash-all-view').style.display  = tab==='all' ? 'block' : 'none';
+  document.getElementById('dash-student-view').style.display = tab==='student' ? 'block' : 'none';
+  if(tab==='all') showTeacherDashboard();
+}
+
+function printReport(){
+  // Make sure the right view is visible for printing
+  window.print();
+}
+
+// ── Wire auto-save into finishMission ──
+// Called after missionScores is set
+const _origShowDebrief = showDebrief;
+function showDebrief(mIdx){
+  // Track missed words from current spell run
+  if(!G.spellMissed) G.spellMissed = [];
+  _origShowDebrief(mIdx);
+  // Auto-save to Firebase (async, non-blocking)
+  fbSaveMission(mIdx);
+}
+
 </script>
 </body>
 </html>
