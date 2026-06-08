@@ -1432,7 +1432,7 @@ function startStage(stage){
 
 // ── TAP WARM-UP ──
 function initTapWarmup(mIdx){
-  G.tapWords = TAP_WORDS[mIdx];
+  G.tapWords = shuffle(TAP_WORDS[mIdx]);
   G.tapIdx = 0; G.tapCorrect = 0; G.tapP2Correct = 0; G.tapTapCount = 0; G.tapAnswered = false;
   G.tapPhase = 1; G.activePlayer = 1;
   const m = MISSIONS[mIdx];
